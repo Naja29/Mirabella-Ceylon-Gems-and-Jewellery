@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Complete your order securely — Mirabella Ceylon Gems & Jewellery. Fast worldwide shipping on certified gemstones." />
+  <title>Checkout | Mirabella Ceylon</title>
+
+  <link rel="icon" type="image/png" href="assets/images/favicon.png" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Lato:wght@300;400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet" />
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <link rel="stylesheet" href="assets/css/checkout.css" />
+</head>
+<body class="page-loading" data-page="cart" data-header="solid">
+
+<!-- PAGE LOADER -->
+<div class="page-loader" id="pageLoader">
+  <div class="loader-logo">
+    <img src="assets/images/logo.png" alt="Mirabella Ceylon" />
+  </div>
+  <div class="loader-bar"><div class="loader-bar__fill"></div></div>
+</div>
+
+<!-- SHARED HEADER -->
+<div id="mc-header"></div>
+
+
+<!--  BREADCRUMB BAR -->
+<div class="checkout-breadcrumb-bar">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="index.html"><i class="fas fa-home"></i> Home</a>
+      <span class="breadcrumb__sep"><i class="fas fa-chevron-right"></i></span>
+      <a href="shop.html">Collections</a>
+      <span class="breadcrumb__sep"><i class="fas fa-chevron-right"></i></span>
+      <a href="cart.html">Shopping Cart</a>
+      <span class="breadcrumb__sep"><i class="fas fa-chevron-right"></i></span>
+      <span>Checkout</span>
+    </nav>
+  </div>
+</div>
+
+
+<!-- CHECKOUT SECTION -->
+<section class="checkout-section">
+  <div class="container">
+
+    <!-- Step Indicator -->
+    <div class="checkout-steps" role="list">
+      <div class="checkout-step done" role="listitem">
+        <div class="checkout-step__num"><i class="fas fa-check" style="font-size:10px;"></i></div>
+        <span class="checkout-step__label">CART</span>
+      </div>
+      <div class="checkout-step__line done"></div>
+      <div class="checkout-step active" role="listitem">
+        <div class="checkout-step__num">2</div>
+        <span class="checkout-step__label">CHECKOUT</span>
+      </div>
+      <div class="checkout-step__line"></div>
+      <div class="checkout-step" role="listitem">
+        <div class="checkout-step__num">3</div>
+        <span class="checkout-step__label">CONFIRMATION</span>
+      </div>
+    </div>
+
+    <!-- Layout: Form + Sidebar -->
+    <div class="checkout-layout">
+
+      <!-- LEFT: Form Panels -->
+      <div class="checkout-form-wrap">
+
+        <!-- 1. Contact Information -->
+        <div class="checkout-card" id="cardContact">
+          <div class="checkout-card__head">
+            <div class="checkout-card__title">
+              <i class="fas fa-user"></i>
+              Contact Information
+            </div>
+          </div>
+          <div class="checkout-card__body">
+            <form class="co-form" id="contactForm" novalidate>
+              <div class="co-row">
+                <div class="co-field">
+                  <label for="co-firstName">First Name</label>
+                  <div class="co-field__wrap">
+                    <i class="fas fa-user co-field__icon"></i>
+                    <input type="text" id="co-firstName" placeholder="John" autocomplete="given-name" required />
+                  </div>
+                </div>
+                <div class="co-field">
+                  <label for="co-lastName">Last Name</label>
+                  <div class="co-field__wrap">
+                    <i class="fas fa-user co-field__icon"></i>
+                    <input type="text" id="co-lastName" placeholder="Smith" autocomplete="family-name" required />
+                  </div>
+                </div>
+              </div>
+              <div class="co-row">
+                <div class="co-field">
+                  <label for="co-email">Email Address</label>
+                  <div class="co-field__wrap">
+                    <i class="fas fa-envelope co-field__icon"></i>
+                    <input type="email" id="co-email" placeholder="you@example.com" autocomplete="email" required />
+                  </div>
+                </div>
+                <div class="co-field">
+                  <label for="co-phone">Phone Number</label>
+                  <div class="co-field__wrap">
+                    <i class="fas fa-phone co-field__icon"></i>
+                    <input type="tel" id="co-phone" placeholder="+94 77 123 4567" autocomplete="tel" />
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- 2. Shipping Address -->
+        <div class="checkout-card" id="cardShippingAddr">
+          <div class="checkout-card__head">
+            <div class="checkout-card__title">
+              <i class="fas fa-map-marker-alt"></i>
+              Shipping Address
+            </div>
+          </div>
+          <div class="checkout-card__body">
+            <form class="co-form" id="addressForm" novalidate>
+              <div class="co-field">
+                <label for="co-address1">Street Address</label>
+                <div class="co-field__wrap">
+                  <i class="fas fa-home co-field__icon"></i>
+                  <input type="text" id="co-address1" placeholder="123 Main Street" autocomplete="address-line1" required />
+                </div>
+              </div>
+              <div class="co-field">
+                <label for="co-address2">Apartment, Suite, etc. <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label>
+                <div class="co-field__wrap">
+                  <i class="fas fa-building co-field__icon"></i>
+                  <input type="text" id="co-address2" placeholder="Apt 4B" autocomplete="address-line2" />
+                </div>
+              </div>
+              <div class="co-row">
+                <div class="co-field">
+                  <label for="co-city" id="labelCity">City / Town</label>
+                  <div class="co-field__wrap">
+                    <i class="fas fa-city co-field__icon"></i>
+                    <input type="text" id="co-city" placeholder="Colombo" autocomplete="address-level2" required />
+                  </div>
+                </div>
+                <div class="co-field">
+                  <label for="co-country">Country</label>
+                  <div class="co-field__wrap">
+                    <i class="fas fa-globe co-field__icon"></i>
+                    <select id="co-country" autocomplete="country-name" required>
+                      <option value="" disabled>Select country</option>
+                      <option value="LK" selected>Sri Lanka</option>
+                      <optgroup label="────────────────">
+                      <option value="US">United States</option>
+                      <option value="GB">United Kingdom</option>
+                      <option value="AU">Australia</option>
+                      <option value="CA">Canada</option>
+                      <option value="DE">Germany</option>
+                      <option value="FR">France</option>
+                      <option value="JP">Japan</option>
+                      <option value="SG">Singapore</option>
+                      <option value="AE">United Arab Emirates</option>
+                      <option value="IN">India</option>
+                      <option value="other">Other</option>
+                      </optgroup>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- District — shown only for Sri Lanka -->
+              <div class="co-field" id="fieldDistrict">
+                <label for="co-district">District</label>
+                <div class="co-field__wrap">
+                  <i class="fas fa-map-marker-alt co-field__icon"></i>
+                  <select id="co-district">
+                    <option value="" disabled selected>Select district</option>
+                    <option>Colombo</option>
+                    <option>Gampaha</option>
+                    <option>Kalutara</option>
+                    <option>Kandy</option>
+                    <option>Matale</option>
+                    <option>Nuwara Eliya</option>
+                    <option>Galle</option>
+                    <option>Matara</option>
+                    <option>Hambantota</option>
+                    <option>Jaffna</option>
+                    <option>Kilinochchi</option>
+                    <option>Mannar</option>
+                    <option>Vavuniya</option>
+                    <option>Mullaitivu</option>
+                    <option>Batticaloa</option>
+                    <option>Ampara</option>
+                    <option>Trincomalee</option>
+                    <option>Kurunegala</option>
+                    <option>Puttalam</option>
+                    <option>Anuradhapura</option>
+                    <option>Polonnaruwa</option>
+                    <option>Badulla</option>
+                    <option>Moneragala</option>
+                    <option>Ratnapura</option>
+                    <option>Kegalle</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- State — shown for international -->
+              <div class="co-field" id="fieldState" style="display:none;">
+                <label for="co-state" id="labelState">State / Province</label>
+                <div class="co-field__wrap">
+                  <i class="fas fa-map co-field__icon"></i>
+                  <input type="text" id="co-state" placeholder="e.g. New York" autocomplete="address-level1" />
+                </div>
+              </div>
+
+              <div class="co-field">
+                <label for="co-zip" id="labelZip">Postal Code <span id="zipOptional" style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label>
+                <div class="co-field__wrap">
+                  <i class="fas fa-envelope-open-text co-field__icon"></i>
+                  <input type="text" id="co-zip" placeholder="e.g. 10001" autocomplete="postal-code" />
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- 3. Shipping Method -->
+        <div class="checkout-card" id="cardShippingMethod">
+          <div class="checkout-card__head">
+            <div class="checkout-card__title">
+              <i class="fas fa-shipping-fast"></i>
+              Shipping Method
+            </div>
+          </div>
+          <div class="checkout-card__body">
+            <div class="shipping-options" id="shippingOptions">
+
+              <!-- Local (Sri Lanka) options — shown by default -->
+              <label class="shipping-option selected" data-zone="local">
+                <input type="radio" name="shipping" value="local-island" checked />
+                <div class="shipping-option__radio"></div>
+                <div class="shipping-option__icon"><i class="fas fa-box-open"></i></div>
+                <div class="shipping-option__info">
+                  <div class="shipping-option__name">Island-wide Courier</div>
+                  <div class="shipping-option__desc">2 – 4 business days · Tracked &amp; insured</div>
+                </div>
+                <div class="shipping-option__price free">Free</div>
+              </label>
+
+              <label class="shipping-option" data-zone="local">
+                <input type="radio" name="shipping" value="local-sameday" />
+                <div class="shipping-option__radio"></div>
+                <div class="shipping-option__icon"><i class="fas fa-bolt"></i></div>
+                <div class="shipping-option__info">
+                  <div class="shipping-option__name">Colombo Same-Day Delivery</div>
+                  <div class="shipping-option__desc">Colombo district only · Order before 12 noon</div>
+                </div>
+                <div class="shipping-option__price" data-lkr="500">Rs. 500</div>
+              </label>
+
+              <label class="shipping-option" data-zone="local">
+                <input type="radio" name="shipping" value="local-pickup" />
+                <div class="shipping-option__radio"></div>
+                <div class="shipping-option__icon"><i class="fas fa-store"></i></div>
+                <div class="shipping-option__info">
+                  <div class="shipping-option__name">Pick Up — Colombo Showroom</div>
+                  <div class="shipping-option__desc">Ready within 24 hrs · 42 Galle Rd, Colombo 03</div>
+                </div>
+                <div class="shipping-option__price free">Free</div>
+              </label>
+
+              <!-- International options — hidden by default -->
+              <label class="shipping-option" data-zone="intl" style="display:none;">
+                <input type="radio" name="shipping" value="intl-standard" />
+                <div class="shipping-option__radio"></div>
+                <div class="shipping-option__icon"><i class="fas fa-box-open"></i></div>
+                <div class="shipping-option__info">
+                  <div class="shipping-option__name">Free Standard Shipping</div>
+                  <div class="shipping-option__desc">7 – 14 business days · Tracked &amp; insured</div>
+                </div>
+                <div class="shipping-option__price free">Free</div>
+              </label>
+
+              <label class="shipping-option" data-zone="intl" style="display:none;">
+                <input type="radio" name="shipping" value="intl-express" />
+                <div class="shipping-option__radio"></div>
+                <div class="shipping-option__icon"><i class="fas fa-shipping-fast"></i></div>
+                <div class="shipping-option__info">
+                  <div class="shipping-option__name">Express Shipping</div>
+                  <div class="shipping-option__desc">3 – 5 business days · Priority handling</div>
+                </div>
+                <div class="shipping-option__price" data-usd="24">$24.00</div>
+              </label>
+
+              <label class="shipping-option" data-zone="intl" style="display:none;">
+                <input type="radio" name="shipping" value="intl-overnight" />
+                <div class="shipping-option__radio"></div>
+                <div class="shipping-option__icon"><i class="fas fa-paper-plane"></i></div>
+                <div class="shipping-option__info">
+                  <div class="shipping-option__name">Overnight Courier</div>
+                  <div class="shipping-option__desc">Next business day · White-glove delivery</div>
+                </div>
+                <div class="shipping-option__price" data-usd="58">$58.00</div>
+              </label>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Payment -->
+        <div class="checkout-card" id="cardPayment">
+          <div class="checkout-card__head">
+            <div class="checkout-card__title">
+              <i class="fas fa-credit-card"></i>
+              Payment
+            </div>
+          </div>
+          <div class="checkout-card__body">
+
+            <!-- Method tabs -->
+            <div class="payment-methods" id="paymentMethods">
+              <button class="payment-method active" data-method="bank" type="button" data-zone="local">
+                <i class="fas fa-university"></i> Bank Transfer
+              </button>
+              <button class="payment-method" data-method="friMi" type="button" data-zone="local">
+                <img src="assets/images/frimi-logo.png" alt="FriMi" class="pm-logo" onerror="this.outerHTML='<i class=\'fas fa-mobile-alt\'></i>'" />
+                FriMi
+              </button>
+              <button class="payment-method" data-method="ezCash" type="button" data-zone="local">
+                <img src="assets/images/ezcash-logo.png" alt="eZ Cash" class="pm-logo" onerror="this.outerHTML='<i class=\'fas fa-mobile-alt\'></i>'" />
+                eZ Cash
+              </button>
+              <button class="payment-method" data-method="card" type="button" data-zone="intl" style="display:none;">
+                <i class="fab fa-cc-visa"></i> Credit Card
+              </button>
+              <button class="payment-method" data-method="paypal" type="button" data-zone="intl" style="display:none;">
+                <i class="fab fa-cc-paypal"></i> PayPal
+              </button>
+            </div>
+
+            <!-- Bank Transfer details -->
+            <div class="pay-panel" id="panelBank">
+              <div class="bank-details">
+                <div class="bank-details__header">
+                  <i class="fas fa-university"></i>
+                  <span>Bank Transfer Details</span>
+                </div>
+                <div class="bank-details__rows">
+                  <div class="bank-details__row">
+                    <span>Bank</span>
+                    <strong>Bank of Ceylon</strong>
+                  </div>
+                  <div class="bank-details__row">
+                    <span>Branch</span>
+                    <strong>Colombo 03</strong>
+                  </div>
+                  <div class="bank-details__row">
+                    <span>Account Name</span>
+                    <strong>Mirabella Ceylon (Pvt) Ltd</strong>
+                  </div>
+                  <div class="bank-details__row">
+                    <span>Account No.</span>
+                    <strong class="bank-details__acc">0072 1234 5678</strong>
+                  </div>
+                  <div class="bank-details__row">
+                    <span>SWIFT Code</span>
+                    <strong>BCEYLKLX</strong>
+                  </div>
+                </div>
+                <div class="bank-details__note">
+                  <i class="fab fa-whatsapp" style="color:#25d366;"></i>
+                  After transferring, please send the payment slip via WhatsApp. Your order will be dispatched once payment is confirmed.
+                </div>
+              </div>
+            </div>
+
+            <!-- FriMi -->
+            <div class="pay-panel" id="panelFriMi" style="display:none;">
+              <div class="mobile-pay-panel">
+                <div class="mobile-pay-panel__icon" style="background:#5b2d8e;">
+                  <i class="fas fa-mobile-alt"></i>
+                </div>
+                <div class="mobile-pay-panel__info">
+                  <div class="mobile-pay-panel__label">Send payment to FriMi number</div>
+                  <div class="mobile-pay-panel__number">077 123 4567</div>
+                  <div class="mobile-pay-panel__name">Mirabella Ceylon (Pvt) Ltd</div>
+                </div>
+              </div>
+              <div class="bank-details__note" style="margin-top:12px;">
+                <i class="fab fa-whatsapp" style="color:#25d366;"></i>
+                Send the payment screenshot via WhatsApp after completing your transfer.
+              </div>
+            </div>
+
+            <!-- eZ Cash -->
+            <div class="pay-panel" id="panelEzCash" style="display:none;">
+              <div class="mobile-pay-panel">
+                <div class="mobile-pay-panel__icon" style="background:#e31e24;">
+                  <i class="fas fa-mobile-alt"></i>
+                </div>
+                <div class="mobile-pay-panel__info">
+                  <div class="mobile-pay-panel__label">Send payment to eZ Cash number</div>
+                  <div class="mobile-pay-panel__number">071 123 4567</div>
+                  <div class="mobile-pay-panel__name">Mirabella Ceylon (Pvt) Ltd</div>
+                </div>
+              </div>
+              <div class="bank-details__note" style="margin-top:12px;">
+                <i class="fab fa-whatsapp" style="color:#25d366;"></i>
+                Send the payment screenshot via WhatsApp after completing your transfer.
+              </div>
+            </div>
+
+            <!-- Card preview -->
+            <div class="card-preview" id="cardPreview" style="display:none;">
+              <div class="card-preview__chip"></div>
+              <div class="card-preview__number" id="previewNumber">•••• &nbsp;•••• &nbsp;•••• &nbsp;••••</div>
+              <div class="card-preview__bottom">
+                <div>
+                  <div class="card-preview__label">Card Holder</div>
+                  <div class="card-preview__value" id="previewName">FULL NAME</div>
+                </div>
+                <div>
+                  <div class="card-preview__label">Expires</div>
+                  <div class="card-preview__value" id="previewExpiry">MM / YY</div>
+                </div>
+                <div class="card-preview__logo">
+                  <i class="fab fa-cc-visa" id="previewBrand"></i>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card fields -->
+            <form class="co-form" id="paymentForm" novalidate style="display:none;">
+              <div class="co-field">
+                <label for="co-cardName">Name on Card</label>
+                <div class="co-field__wrap">
+                  <i class="fas fa-user co-field__icon"></i>
+                  <input type="text" id="co-cardName" placeholder="John Smith" autocomplete="cc-name" />
+                </div>
+              </div>
+              <div class="co-field">
+                <label for="co-cardNum">Card Number</label>
+                <div class="co-field__wrap">
+                  <i class="fas fa-credit-card co-field__icon"></i>
+                  <input type="text" id="co-cardNum" placeholder="1234 5678 9012 3456" autocomplete="cc-number" maxlength="19" inputmode="numeric" />
+                </div>
+              </div>
+              <div class="co-card-row">
+                <div class="co-field">
+                  <label for="co-cardExpiry">Expiry Date</label>
+                  <div class="co-field__wrap">
+                    <i class="far fa-calendar co-field__icon"></i>
+                    <input type="text" id="co-cardExpiry" placeholder="MM / YY" autocomplete="cc-exp" maxlength="7" />
+                  </div>
+                </div>
+                <div class="co-field">
+                  <label for="co-cardCvc">CVC / CVV</label>
+                  <div class="co-field__wrap">
+                    <i class="fas fa-lock co-field__icon"></i>
+                    <input type="text" id="co-cardCvc" placeholder="•••" maxlength="4" inputmode="numeric" autocomplete="cc-csc" />
+                  </div>
+                </div>
+                <div class="co-field">
+                  <label>&nbsp;</label>
+                  <div style="display:flex;align-items:center;gap:6px;padding:11px 0;">
+                    <i class="fab fa-cc-visa" style="font-size:24px;color:#1a1f71;"></i>
+                    <i class="fab fa-cc-mastercard" style="font-size:24px;color:#eb001b;"></i>
+                    <i class="fab fa-cc-amex" style="font-size:24px;color:#007bc1;"></i>
+                  </div>
+                </div>
+              </div>
+            </form>
+
+            <!-- PayPal panel -->
+            <div class="pay-panel" id="panelPaypal" style="display:none;">
+              <div class="mobile-pay-panel">
+                <div class="mobile-pay-panel__icon" style="background:#003087;">
+                  <i class="fab fa-paypal" style="font-size:20px;"></i>
+                </div>
+                <div class="mobile-pay-panel__info">
+                  <div class="mobile-pay-panel__label">Send PayPal payment to</div>
+                  <div class="mobile-pay-panel__number">payments@mirabelaceylon.com</div>
+                  <div class="mobile-pay-panel__name">Mirabella Ceylon (Pvt) Ltd</div>
+                </div>
+              </div>
+              <div class="bank-details__note" style="margin-top:12px;">
+                <i class="fab fa-whatsapp" style="color:#25d366;"></i>
+                Send the PayPal confirmation via WhatsApp once payment is completed.
+              </div>
+            </div>
+
+            <!-- WhatsApp footer note -->
+            <div class="secure-badge" style="flex-direction:column;align-items:flex-start;gap:6px;margin-top:16px;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <i class="fab fa-whatsapp" style="color:#25d366;font-size:16px;"></i>
+                <strong style="color:var(--text);font-size:12px;">Orders are confirmed via WhatsApp</strong>
+              </div>
+              <span style="font-size:12px;color:var(--text-soft);line-height:1.5;">
+                After placing your order, WhatsApp will open with your order details pre-filled.
+                Our team will confirm and arrange payment before dispatch.
+              </span>
+            </div>
+
+          </div>
+        </div>
+
+      </div><!-- /.checkout-form-wrap -->
+
+
+      <!-- RIGHT: Order Summary Sidebar -->
+      <aside class="checkout-summary">
+        <div class="checkout-summary__head">
+          <span class="checkout-summary__title">Order Summary</span>
+          <div class="currency-toggle" id="currencyToggle" aria-label="Select currency">
+            <button class="currency-btn active" data-currency="USD" type="button">USD</button>
+            <button class="currency-btn" data-currency="LKR" type="button">LKR</button>
+          </div>
+        </div>
+
+        <div class="checkout-summary__items">
+
+          <div class="co-item">
+            <div class="co-item__img">
+              <img src="assets/images/prod-1.jpg" alt="Blue Sapphire" />
+              <span class="co-item__qty-badge">1</span>
+            </div>
+            <span class="co-item__name">Ceylon Blue Sapphire<br /><small style="font-weight:400;color:var(--text-soft);">3.42 ct · Oval · Unheated</small></span>
+            <span class="co-item__price" data-usd="2850">$2,850</span>
+          </div>
+
+          <div class="co-item">
+            <div class="co-item__img">
+              <img src="assets/images/prod-2.jpg" alt="Alexandrite" />
+              <span class="co-item__qty-badge">1</span>
+            </div>
+            <span class="co-item__name">Natural Alexandrite<br /><small style="font-weight:400;color:var(--text-soft);">1.18 ct · Round · Colour-change</small></span>
+            <span class="co-item__price" data-usd="4200">$4,200</span>
+          </div>
+
+          <div class="co-item">
+            <div class="co-item__img">
+              <img src="assets/images/prod-3.jpg" alt="Padparadscha" />
+              <span class="co-item__qty-badge">2</span>
+            </div>
+            <span class="co-item__name">Padparadscha Sapphire<br /><small style="font-weight:400;color:var(--text-soft);">0.95 ct · Cushion · Pink-orange</small></span>
+            <span class="co-item__price" data-usd="3600">$3,600</span>
+          </div>
+
+        </div>
+
+        <div class="checkout-summary__totals">
+          <div class="co-total-row">
+            <span>Subtotal</span>
+            <span data-usd="10650">$10,650</span>
+          </div>
+          <div class="co-total-row">
+            <span>Shipping</span>
+            <span class="co-total-free" id="summaryShipping">Free</span>
+          </div>
+          <div class="co-total-row">
+            <span>Discount (MIRABELLA10)</span>
+            <span style="color:var(--gold-dark);" data-usd-neg="1065">−$1,065</span>
+          </div>
+          <div class="co-total-row">
+            <span>VAT (18%)</span>
+            <span data-usd="957">$957</span>
+          </div>
+        </div>
+
+        <div class="checkout-summary__grand">
+          <span>Total</span>
+          <span data-usd="10542">$10,542</span>
+        </div>
+        <div class="lkr-rate-note" id="lkrRateNote" style="display:none;">
+          <i class="fas fa-info-circle"></i> 1 USD ≈ Rs. 320 &nbsp;·&nbsp; indicative rate only
+        </div>
+
+        <div class="co-place-order-btn">
+          <button class="btn btn-primary" id="placeOrderBtn" type="button" style="background:#25d366;border-color:#25d366;">
+            <i class="fab fa-whatsapp" style="font-size:16px;"></i> &nbsp;Place Order via WhatsApp
+          </button>
+        </div>
+
+        <div class="checkout-summary__secure">
+          <i class="fab fa-whatsapp" style="color:#25d366;"></i>
+          Order confirmed via WhatsApp · GIA Certified
+        </div>
+      </aside>
+
+    </div><!-- /.checkout-layout -->
+
+  </div><!-- /.container -->
+</section>
+
+
+<!-- SHARED FOOTER -->
+<div id="mc-footer"></div>
+
+<!-- Scripts -->
+<script src="assets/js/includes.js"></script>
+<script src="assets/js/main.js"></script>
+<script src="assets/js/checkout.js"></script>
+</body>
+</html>

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="My Orders — Mirabella Ceylon. Track and manage your gemstone purchases." />
+  <title>My Orders | Mirabella Ceylon</title>
+  <link rel="icon" type="image/png" href="assets/images/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Lato:wght@300;400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <link rel="stylesheet" href="assets/css/account.css" />
+</head>
+<body class="page-loading" data-page="orders" data-header="solid">
+
+<div class="page-loader" id="pageLoader">
+  <div class="loader-logo"><img src="assets/images/logo.png" alt="Mirabella Ceylon" /></div>
+  <div class="loader-bar"><div class="loader-bar__fill"></div></div>
+</div>
+
+<div id="mc-header"></div>
+
+
+<!-- BREADCRUMB -->
+<div class="account-breadcrumb-bar">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="index.html"><i class="fas fa-home"></i> Home</a>
+      <span class="breadcrumb__sep"><i class="fas fa-chevron-right"></i></span>
+      <span>My Orders</span>
+    </nav>
+  </div>
+</div>
+
+
+<!-- PAGE HEADER -->
+<div class="account-page-hero">
+  <div class="container account-page-hero__inner">
+    <div>
+      <div class="eyebrow" style="justify-content:flex-start;">Your Account</div>
+      <h1 class="account-page-hero__title">My Orders</h1>
+      <p class="account-page-hero__sub">Track your purchases and shipments in one place.</p>
+    </div>
+    <div class="account-page-hero__icon" aria-hidden="true"><i class="fas fa-box-open"></i></div>
+  </div>
+</div>
+
+
+<!-- ORDERS CONTENT -->
+<section class="account-section">
+  <div class="container">
+
+    <!-- Filter tabs -->
+    <div class="orders-tabs" id="ordersTabs">
+      <button class="orders-tab active" data-filter="all">All Orders</button>
+      <button class="orders-tab" data-filter="processing">Processing</button>
+      <button class="orders-tab" data-filter="transit">In Transit</button>
+      <button class="orders-tab" data-filter="delivered">Delivered</button>
+      <button class="orders-tab" data-filter="cancelled">Cancelled</button>
+    </div>
+
+    <!-- Order list -->
+    <div class="orders-list" id="ordersList">
+
+      <!-- Order 1 — Delivered -->
+      <div class="order-card" data-status="delivered">
+        <div class="order-card__header">
+          <div class="order-card__meta">
+            <div class="order-card__num">Order #MC-2024-0312</div>
+            <div class="order-card__date"><i class="fas fa-calendar-alt"></i> 12 March 2024</div>
+          </div>
+          <div class="order-card__header-right">
+            <span class="order-status order-status--delivered"><i class="fas fa-check-circle"></i> Delivered</span>
+            <div class="order-card__total">$12,500</div>
+          </div>
+        </div>
+
+        <div class="order-card__items">
+          <div class="order-item">
+            <div class="order-item__img">
+              <img src="assets/images/prod-1.jpg" alt="Royal Blue Ceylon Sapphire" />
+            </div>
+            <div class="order-item__info">
+              <div class="order-item__cat">Blue Sapphires</div>
+              <div class="order-item__name">Royal Blue Ceylon Sapphire — 4.82ct</div>
+              <div class="order-item__specs"><span>Qty: 1</span><span>GIA Certified</span><span>Unheated</span></div>
+            </div>
+            <div class="order-item__price">$12,500</div>
+          </div>
+        </div>
+
+        <div class="order-card__footer">
+          <div class="order-track-bar">
+            <div class="order-track__step done"><div class="order-track__dot"><i class="fas fa-check"></i></div><span>Order Placed</span></div>
+            <div class="order-track__line done"></div>
+            <div class="order-track__step done"><div class="order-track__dot"><i class="fas fa-check"></i></div><span>Confirmed</span></div>
+            <div class="order-track__line done"></div>
+            <div class="order-track__step done"><div class="order-track__dot"><i class="fas fa-check"></i></div><span>Dispatched</span></div>
+            <div class="order-track__line done"></div>
+            <div class="order-track__step done active"><div class="order-track__dot"><i class="fas fa-check"></i></div><span>Delivered</span></div>
+          </div>
+          <div class="order-card__actions">
+            <button class="order-btn order-btn--outline"><i class="fas fa-file-invoice"></i> Invoice</button>
+            <button class="order-btn order-btn--outline"><i class="fas fa-redo-alt"></i> Buy Again</button>
+            <a href="product-detail.html" class="order-btn order-btn--gold"><i class="fas fa-eye"></i> View Item</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order 2 — In Transit -->
+      <div class="order-card" data-status="transit">
+        <div class="order-card__header">
+          <div class="order-card__meta">
+            <div class="order-card__num">Order #MC-2024-0298</div>
+            <div class="order-card__date"><i class="fas fa-calendar-alt"></i> 5 March 2024</div>
+          </div>
+          <div class="order-card__header-right">
+            <span class="order-status order-status--transit"><i class="fas fa-shipping-fast"></i> In Transit</span>
+            <div class="order-card__total">$26,000</div>
+          </div>
+        </div>
+
+        <div class="order-card__items">
+          <div class="order-item">
+            <div class="order-item__img">
+              <img src="assets/images/prod-3.jpg" alt="Padparadscha Sapphire" />
+            </div>
+            <div class="order-item__info">
+              <div class="order-item__cat">Padparadscha</div>
+              <div class="order-item__name">Padparadscha Sapphire — 2.75ct</div>
+              <div class="order-item__specs"><span>Qty: 1</span><span>GIA Certified</span><span>Unheated</span></div>
+            </div>
+            <div class="order-item__price">$18,500</div>
+          </div>
+          <div class="order-item">
+            <div class="order-item__img">
+              <img src="assets/images/prod-4.jpg" alt="Blue Star Sapphire" />
+            </div>
+            <div class="order-item__info">
+              <div class="order-item__cat">Star Sapphires</div>
+              <div class="order-item__name">Blue Star Sapphire — 6.50ct</div>
+              <div class="order-item__specs"><span>Qty: 1</span><span>GRS Certified</span></div>
+            </div>
+            <div class="order-item__price">$7,200</div>
+          </div>
+        </div>
+
+        <div class="order-card__footer">
+          <div class="order-track-bar">
+            <div class="order-track__step done"><div class="order-track__dot"><i class="fas fa-check"></i></div><span>Order Placed</span></div>
+            <div class="order-track__line done"></div>
+            <div class="order-track__step done"><div class="order-track__dot"><i class="fas fa-check"></i></div><span>Confirmed</span></div>
+            <div class="order-track__line done"></div>
+            <div class="order-track__step done active"><div class="order-track__dot"><i class="fas fa-shipping-fast"></i></div><span>Dispatched</span></div>
+            <div class="order-track__line"></div>
+            <div class="order-track__step"><div class="order-track__dot"></div><span>Delivered</span></div>
+          </div>
+          <div class="order-card__actions">
+            <button class="order-btn order-btn--outline"><i class="fas fa-file-invoice"></i> Invoice</button>
+            <button class="order-btn order-btn--gold"><i class="fas fa-map-marker-alt"></i> Track Shipment</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order 3 — Processing -->
+      <div class="order-card" data-status="processing">
+        <div class="order-card__header">
+          <div class="order-card__meta">
+            <div class="order-card__num">Order #MC-2024-0341</div>
+            <div class="order-card__date"><i class="fas fa-calendar-alt"></i> 18 March 2024</div>
+          </div>
+          <div class="order-card__header-right">
+            <span class="order-status order-status--processing"><i class="fas fa-spinner fa-spin"></i> Processing</span>
+            <div class="order-card__total">$4,100</div>
+          </div>
+        </div>
+
+        <div class="order-card__items">
+          <div class="order-item">
+            <div class="order-item__img">
+              <img src="assets/images/prod-6.jpg" alt="Natural Ceylon Ruby" />
+            </div>
+            <div class="order-item__info">
+              <div class="order-item__cat">Rubies</div>
+              <div class="order-item__name">Natural Ceylon Ruby — 2.1ct</div>
+              <div class="order-item__specs"><span>Qty: 1</span><span>GIA Certified</span></div>
+            </div>
+            <div class="order-item__price">$4,100</div>
+          </div>
+        </div>
+
+        <div class="order-card__footer">
+          <div class="order-track-bar">
+            <div class="order-track__step done active"><div class="order-track__dot"><i class="fas fa-check"></i></div><span>Order Placed</span></div>
+            <div class="order-track__line"></div>
+            <div class="order-track__step"><div class="order-track__dot"></div><span>Confirmed</span></div>
+            <div class="order-track__line"></div>
+            <div class="order-track__step"><div class="order-track__dot"></div><span>Dispatched</span></div>
+            <div class="order-track__line"></div>
+            <div class="order-track__step"><div class="order-track__dot"></div><span>Delivered</span></div>
+          </div>
+          <div class="order-card__actions">
+            <button class="order-btn order-btn--outline order-btn--danger"><i class="fas fa-times"></i> Cancel Order</button>
+            <button class="order-btn order-btn--outline"><i class="fas fa-envelope"></i> Contact Us</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order 4 — Cancelled -->
+      <div class="order-card order-card--cancelled" data-status="cancelled">
+        <div class="order-card__header">
+          <div class="order-card__meta">
+            <div class="order-card__num">Order #MC-2024-0271</div>
+            <div class="order-card__date"><i class="fas fa-calendar-alt"></i> 22 February 2024</div>
+          </div>
+          <div class="order-card__header-right">
+            <span class="order-status order-status--cancelled"><i class="fas fa-times-circle"></i> Cancelled</span>
+            <div class="order-card__total">$9,800</div>
+          </div>
+        </div>
+
+        <div class="order-card__items">
+          <div class="order-item">
+            <div class="order-item__img">
+              <img src="assets/images/prod-2.jpg" alt="Cornflower Blue Sapphire" />
+            </div>
+            <div class="order-item__info">
+              <div class="order-item__cat">Blue Sapphires</div>
+              <div class="order-item__name">Cornflower Blue Sapphire — 3.10ct</div>
+              <div class="order-item__specs"><span>Qty: 1</span><span>GIA Certified</span></div>
+            </div>
+            <div class="order-item__price">$9,800</div>
+          </div>
+        </div>
+
+        <div class="order-card__footer">
+          <p class="order-cancelled-note"><i class="fas fa-info-circle"></i> This order was cancelled on 23 February 2024. A full refund was issued within 5 business days.</p>
+          <div class="order-card__actions">
+            <button class="order-btn order-btn--outline"><i class="fas fa-redo-alt"></i> Reorder</button>
+            <a href="product-detail.html" class="order-btn order-btn--gold"><i class="fas fa-eye"></i> View Item</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Empty state -->
+    <div class="account-empty" id="ordersEmpty" style="display:none;">
+      <div class="account-empty__icon"><i class="fas fa-box-open"></i></div>
+      <h2 class="account-empty__title">No orders yet</h2>
+      <p class="account-empty__text">When you place your first order it will appear here. Start exploring our certified gemstone collections.</p>
+      <a href="shop.html" class="btn btn--gold"><i class="fas fa-gem"></i> Shop Now</a>
+    </div>
+
+  </div>
+</section>
+
+
+<div id="mc-footer"></div>
+<script src="assets/js/includes.js"></script>
+<script src="assets/js/main.js"></script>
+<script src="assets/js/orders-page.js"></script>
+</body>
+</html>

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Order confirmed — thank you for your purchase at Mirabella Ceylon Gems & Jewellery." />
+  <title>Order Confirmed | Mirabella Ceylon</title>
+
+  <link rel="icon" type="image/png" href="assets/images/favicon.png" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Lato:wght@300;400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet" />
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <link rel="stylesheet" href="assets/css/checkout.css" />
+</head>
+<body class="page-loading" data-page="cart" data-header="solid">
+
+<!-- PAGE LOADER -->
+<div class="page-loader" id="pageLoader">
+  <div class="loader-logo">
+    <img src="assets/images/logo.png" alt="Mirabella Ceylon" />
+  </div>
+  <div class="loader-bar"><div class="loader-bar__fill"></div></div>
+</div>
+
+<!-- SHARED HEADER -->
+<div id="mc-header"></div>
+
+
+<!-- BREADCRUMB BAR -->
+<div class="checkout-breadcrumb-bar">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="index.html"><i class="fas fa-home"></i> Home</a>
+      <span class="breadcrumb__sep"><i class="fas fa-chevron-right"></i></span>
+      <a href="shop.html">Collections</a>
+      <span class="breadcrumb__sep"><i class="fas fa-chevron-right"></i></span>
+      <a href="cart.html">Cart</a>
+      <span class="breadcrumb__sep"><i class="fas fa-chevron-right"></i></span>
+      <a href="checkout.html">Checkout</a>
+      <span class="breadcrumb__sep"><i class="fas fa-chevron-right"></i></span>
+      <span>Confirmation</span>
+    </nav>
+  </div>
+</div>
+
+
+<!-- CONFIRMATION SECTION -->
+<section class="confirm-section">
+  <div class="container">
+
+    <!-- Step Indicator -->
+    <div class="checkout-steps" role="list" style="margin-bottom:48px;">
+      <div class="checkout-step done" role="listitem">
+        <div class="checkout-step__num"><i class="fas fa-check" style="font-size:10px;"></i></div>
+        <span class="checkout-step__label">CART</span>
+      </div>
+      <div class="checkout-step__line done"></div>
+      <div class="checkout-step done" role="listitem">
+        <div class="checkout-step__num"><i class="fas fa-check" style="font-size:10px;"></i></div>
+        <span class="checkout-step__label">CHECKOUT</span>
+      </div>
+      <div class="checkout-step__line done"></div>
+      <div class="checkout-step active" role="listitem">
+        <div class="checkout-step__num">3</div>
+        <span class="checkout-step__label">CONFIRMATION</span>
+      </div>
+    </div>
+
+    <!-- Success Hero -->
+    <div class="confirm-hero">
+      <div class="confirm-hero__check">
+        <i class="fas fa-check"></i>
+      </div>
+      <div class="confirm-hero__eyebrow">Order Confirmed</div>
+      <h1 class="confirm-hero__title">Thank you for your order!</h1>
+      <p class="confirm-hero__sub">
+        Your certified gemstones are being carefully prepared for shipment.
+        A confirmation email has been sent to <strong>john.smith@example.com</strong>.
+      </p>
+      <div class="confirm-hero__order-num">
+        <i class="fas fa-receipt"></i>
+        Order Number: <span>#MCG-2024-00847</span>
+      </div>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="confirm-layout">
+
+      <!-- LEFT: Details -->
+      <div>
+
+        <!-- Ordered Items -->
+        <div class="confirm-card">
+          <div class="confirm-card__head">
+            <i class="fas fa-gem"></i>
+            Items Ordered
+          </div>
+          <div class="confirm-card__body">
+            <div class="confirm-items">
+
+              <div class="confirm-item">
+                <div class="confirm-item__img">
+                  <img src="assets/images/prod-1.jpg" alt="Ceylon Blue Sapphire" />
+                </div>
+                <div>
+                  <div class="confirm-item__cat">Blue Sapphire</div>
+                  <div class="confirm-item__name">Ceylon Blue Sapphire</div>
+                  <div class="confirm-item__specs">3.42 ct &nbsp;·&nbsp; Oval Cut &nbsp;·&nbsp; Unheated &nbsp;·&nbsp; GIA Certified &nbsp;·&nbsp; Qty: 1</div>
+                </div>
+                <div class="confirm-item__price" data-usd="2850">$2,850</div>
+              </div>
+
+              <div class="confirm-item">
+                <div class="confirm-item__img">
+                  <img src="assets/images/prod-2.jpg" alt="Natural Alexandrite" />
+                </div>
+                <div>
+                  <div class="confirm-item__cat">Alexandrite</div>
+                  <div class="confirm-item__name">Natural Alexandrite</div>
+                  <div class="confirm-item__specs">1.18 ct &nbsp;·&nbsp; Round Cut &nbsp;·&nbsp; Colour-change &nbsp;·&nbsp; GIA Certified &nbsp;·&nbsp; Qty: 1</div>
+                </div>
+                <div class="confirm-item__price" data-usd="4200">$4,200</div>
+              </div>
+
+              <div class="confirm-item">
+                <div class="confirm-item__img">
+                  <img src="assets/images/prod-3.jpg" alt="Padparadscha Sapphire" />
+                </div>
+                <div>
+                  <div class="confirm-item__cat">Padparadscha</div>
+                  <div class="confirm-item__name">Padparadscha Sapphire</div>
+                  <div class="confirm-item__specs">0.95 ct &nbsp;·&nbsp; Cushion Cut &nbsp;·&nbsp; Pink-orange &nbsp;·&nbsp; GIA Certified &nbsp;·&nbsp; Qty: 2</div>
+                </div>
+                <div class="confirm-item__price" data-usd="3600">$3,600</div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Shipping & Payment Info -->
+        <div class="confirm-card">
+          <div class="confirm-card__head">
+            <i class="fas fa-map-marker-alt"></i>
+            Shipping &amp; Payment Details
+          </div>
+          <div class="confirm-card__body">
+            <div class="confirm-info-grid">
+              <div>
+                <div class="confirm-info__label">Ship To</div>
+                <div class="confirm-info__val">
+                  <strong>Kasun Perera</strong>
+                  45 Galle Road, Apt 3A<br />
+                  Colombo, Colombo District<br />
+                  Sri Lanka
+                </div>
+              </div>
+              <div>
+                <div class="confirm-info__label">Contact</div>
+                <div class="confirm-info__val">
+                  <strong>kasun.perera@example.com</strong>
+                  +94 77 123 4567
+                </div>
+              </div>
+              <div>
+                <div class="confirm-info__label">Shipping Method</div>
+                <div class="confirm-info__val">
+                  <strong>Free Standard Shipping</strong>
+                  7 – 14 business days<br />
+                  Tracked &amp; fully insured
+                </div>
+              </div>
+              <div>
+                <div class="confirm-info__label">Payment</div>
+                <div class="confirm-info__val">
+                  <strong>Visa ending in 4242</strong>
+                  <i class="fab fa-cc-visa" style="font-size:18px;color:#1a1f71;vertical-align:middle;margin-left:4px;"></i><br />
+                  Charged on <span style="color:var(--text);">10 Apr 2024</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Delivery Timeline -->
+        <div class="confirm-card">
+          <div class="confirm-card__head">
+            <i class="fas fa-route"></i>
+            Delivery Timeline
+          </div>
+          <div class="confirm-card__body">
+            <div class="confirm-timeline">
+
+              <div class="confirm-timeline__item done">
+                <div class="confirm-timeline__dot"><i class="fas fa-check"></i></div>
+                <div class="confirm-timeline__text">
+                  <strong>Order Placed</strong>
+                  <span>10 April 2024 &nbsp;·&nbsp; Payment confirmed</span>
+                </div>
+              </div>
+
+              <div class="confirm-timeline__item active">
+                <div class="confirm-timeline__dot"><i class="fas fa-box"></i></div>
+                <div class="confirm-timeline__text">
+                  <strong>Preparing Your Order</strong>
+                  <span>Gemstones being inspected, certified &amp; packaged</span>
+                </div>
+              </div>
+
+              <div class="confirm-timeline__item">
+                <div class="confirm-timeline__dot"><i class="fas fa-shipping-fast"></i></div>
+                <div class="confirm-timeline__text">
+                  <strong>Dispatched</strong>
+                  <span>Expected: 12 – 13 April 2024</span>
+                </div>
+              </div>
+
+              <div class="confirm-timeline__item">
+                <div class="confirm-timeline__dot"><i class="fas fa-plane"></i></div>
+                <div class="confirm-timeline__text">
+                  <strong>In Transit</strong>
+                  <span>Tracked express international shipment</span>
+                </div>
+              </div>
+
+              <div class="confirm-timeline__item">
+                <div class="confirm-timeline__dot"><i class="fas fa-home"></i></div>
+                <div class="confirm-timeline__text">
+                  <strong>Delivered</strong>
+                  <span>Estimated: 17 – 24 April 2024</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+
+      <!-- RIGHT: Sidebar -->
+      <aside class="confirm-sidebar">
+
+        <!-- Order Summary -->
+        <div class="confirm-summary">
+          <div class="confirm-summary__head" style="display:flex;align-items:center;justify-content:space-between;">
+            <span>Order Summary</span>
+            <div class="currency-toggle" id="currencyToggle" aria-label="Select currency">
+              <button class="currency-btn active" data-currency="USD" type="button">USD</button>
+              <button class="currency-btn" data-currency="LKR" type="button">LKR</button>
+            </div>
+          </div>
+          <div class="confirm-summary__rows">
+            <div class="confirm-summary__row">
+              <span>Subtotal (4 items)</span>
+              <span data-usd="10650">$10,650</span>
+            </div>
+            <div class="confirm-summary__row">
+              <span>Shipping</span>
+              <span style="color:var(--gold-dark);">Free</span>
+            </div>
+            <div class="confirm-summary__row">
+              <span>Discount (MIRABELLA10)</span>
+              <span style="color:var(--gold-dark);" data-usd-neg="1065">−$1,065</span>
+            </div>
+            <div class="confirm-summary__row">
+              <span>VAT (18%)</span>
+              <span data-usd="957">$957</span>
+            </div>
+            <div class="confirm-summary__row total">
+              <span>Total Paid</span>
+              <span data-usd="10542">$10,542</span>
+            </div>
+          </div>
+          <div class="lkr-rate-note" id="lkrRateNote" style="display:none;margin:0 16px 16px;">
+            <i class="fas fa-info-circle"></i> 1 USD ≈ Rs. 320 &nbsp;·&nbsp; indicative rate only
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="confirm-actions">
+          <a href="orders.html" class="btn btn-primary">
+            <i class="fas fa-box-open"></i> &nbsp;Track My Order
+          </a>
+          <a href="shop.html" class="btn btn-outline">
+            <i class="fas fa-gem"></i> &nbsp;Continue Shopping
+          </a>
+          <button class="btn btn-outline" type="button" onclick="window.print()">
+            <i class="fas fa-print"></i> &nbsp;Print Receipt
+          </button>
+        </div>
+
+        <!-- Need help? -->
+        <div style="margin-top:20px;padding:18px;background:var(--white);border:1px solid var(--border-light);border-radius:var(--radius-lg);">
+          <div style="font-family:var(--font-display);font-size:15px;color:var(--text);margin-bottom:10px;">
+            <i class="fas fa-headset" style="color:var(--gold);margin-right:8px;"></i> Need Help?
+          </div>
+          <p style="font-size:13px;color:var(--text-soft);line-height:1.7;margin-bottom:12px;">
+            Our gemstone specialists are available 24/7 to assist with your order.
+          </p>
+          <a href="contact.html" class="btn btn-outline" style="width:100%;justify-content:center;height:40px;font-size:11px;">
+            Contact Support
+          </a>
+        </div>
+
+      </aside>
+
+    </div>
+
+  </div>
+</section>
+
+
+<!-- SHARED FOOTER -->
+<div id="mc-footer"></div>
+
+<!-- Scripts -->
+<script src="assets/js/includes.js"></script>
+<script src="assets/js/main.js"></script>
+<script>
+  // Currency toggle (same rate as checkout.js)
+  const LKR_RATE = 320;
+  let activeCurrency = 'USD';
+
+  function fmtPrice(usd) {
+    if (activeCurrency === 'LKR') {
+      return 'Rs.\u00a0' + Math.round(usd * LKR_RATE).toLocaleString('en-US');
+    }
+    return '$' + Number(usd).toLocaleString('en-US');
+  }
+
+  function refreshPrices() {
+    document.querySelectorAll('[data-usd]').forEach(el => {
+      const v = parseFloat(el.dataset.usd);
+      if (!isNaN(v)) el.textContent = fmtPrice(v);
+    });
+    document.querySelectorAll('[data-usd-neg]').forEach(el => {
+      const v = parseFloat(el.dataset.usdNeg);
+      if (!isNaN(v)) el.textContent = '\u2212' + fmtPrice(v);
+    });
+  }
+
+  document.addEventListener('mc:ready', () => {
+    const toggle   = document.getElementById('currencyToggle');
+    const rateNote = document.getElementById('lkrRateNote');
+    if (!toggle) return;
+    toggle.querySelectorAll('.currency-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        toggle.querySelectorAll('.currency-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeCurrency = btn.dataset.currency;
+        refreshPrices();
+        if (rateNote) rateNote.style.display = activeCurrency === 'LKR' ? 'flex' : 'none';
+      });
+    });
+  });
+</script>
+</body>
+</html>

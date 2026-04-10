@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="My Profile — Mirabella Ceylon. Manage your account details, addresses and preferences." />
+  <title>My Profile | Mirabella Ceylon</title>
+  <link rel="icon" type="image/png" href="assets/images/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Lato:wght@300;400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <link rel="stylesheet" href="assets/css/account.css" />
+</head>
+<body class="page-loading" data-page="profile" data-header="solid">
+
+<!-- PAGE LOADER -->
+<div class="page-loader" id="pageLoader">
+  <div class="loader-logo"><img src="assets/images/logo.png" alt="Mirabella Ceylon" /></div>
+  <div class="loader-bar"><div class="loader-bar__fill"></div></div>
+</div>
+
+<!-- SHARED HEADER -->
+<div id="mc-header"></div>
+
+
+<!-- BREADCRUMB -->
+<div class="account-breadcrumb-bar">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="index.html"><i class="fas fa-home"></i> Home</a>
+      <span class="breadcrumb__sep"><i class="fas fa-chevron-right"></i></span>
+      <span>My Profile</span>
+    </nav>
+  </div>
+</div>
+
+
+<!-- PAGE HERO -->
+<div class="account-page-hero">
+  <div class="container account-page-hero__inner">
+    <div>
+      <div class="eyebrow" style="justify-content:flex-start;">Your Account</div>
+      <h1 class="account-page-hero__title">My Profile</h1>
+      <p class="account-page-hero__sub">Manage your personal details, addresses and preferences.</p>
+    </div>
+    <div class="account-page-hero__icon" aria-hidden="true"><i class="fas fa-user-circle"></i></div>
+  </div>
+</div>
+
+
+<!-- PROFILE CONTENT -->
+<section class="account-section">
+  <div class="container">
+    <div class="profile-layout">
+
+      <!-- SIDEBAR -->
+      <aside class="profile-sidebar">
+
+        <!-- Avatar card -->
+        <div class="profile-avatar-card">
+          <div class="profile-avatar-card__banner"></div>
+          <div class="profile-avatar-card__main">
+            <div class="profile-avatar">
+              KP
+              <button class="profile-avatar__edit" title="Change photo" type="button">
+                <i class="fas fa-camera"></i>
+              </button>
+            </div>
+            <div class="profile-name">Kasun Perera</div>
+            <div class="profile-email">kasun.perera@example.com</div>
+            <div class="profile-member-badge">
+              <i class="fas fa-gem"></i> Member since 2024
+            </div>
+          </div>
+          <div class="profile-stats">
+            <div class="profile-stat">
+              <div class="profile-stat__val">4</div>
+              <div class="profile-stat__label">Orders</div>
+            </div>
+            <div class="profile-stat">
+              <div class="profile-stat__val">6</div>
+              <div class="profile-stat__label">Wishlist</div>
+            </div>
+            <div class="profile-stat">
+              <div class="profile-stat__val">2</div>
+              <div class="profile-stat__label">Addresses</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Nav -->
+        <nav class="profile-nav" role="navigation" aria-label="Profile navigation">
+          <button class="profile-nav__item active" data-panel="personal" type="button">
+            <i class="fas fa-user"></i>
+            Personal Information
+            <i class="fas fa-chevron-right profile-nav__arrow"></i>
+          </button>
+          <button class="profile-nav__item" data-panel="password" type="button">
+            <i class="fas fa-lock"></i>
+            Change Password
+            <i class="fas fa-chevron-right profile-nav__arrow"></i>
+          </button>
+          <button class="profile-nav__item" data-panel="addresses" type="button">
+            <i class="fas fa-map-marker-alt"></i>
+            Saved Addresses
+            <i class="fas fa-chevron-right profile-nav__arrow"></i>
+          </button>
+          <button class="profile-nav__item" data-panel="preferences" type="button">
+            <i class="fas fa-sliders-h"></i>
+            Preferences
+            <i class="fas fa-chevron-right profile-nav__arrow"></i>
+          </button>
+          <a href="orders.html" class="profile-nav__item">
+            <i class="fas fa-box-open"></i>
+            My Orders
+            <i class="fas fa-chevron-right profile-nav__arrow"></i>
+          </a>
+          <a href="wishlist.html" class="profile-nav__item">
+            <i class="far fa-heart"></i>
+            My Wishlist
+            <i class="fas fa-chevron-right profile-nav__arrow"></i>
+          </a>
+          <button class="profile-nav__item profile-nav__item--danger" type="button" id="signOutBtn">
+            <i class="fas fa-sign-out-alt"></i>
+            Sign Out
+            <i class="fas fa-chevron-right profile-nav__arrow"></i>
+          </button>
+        </nav>
+
+      </aside><!-- /.profile-sidebar -->
+
+
+      <!-- MAIN PANELS -->
+      <div class="profile-content">
+
+        <!-- PANEL: Personal Information  -->
+        <div class="profile-panel active" id="panelPersonal">
+          <div class="profile-card">
+            <div class="profile-card__head">
+              <div class="profile-card__title">
+                <i class="fas fa-user"></i> Personal Information
+              </div>
+            </div>
+            <div class="profile-card__body">
+              <form class="co-form" id="personalForm" novalidate>
+
+                <div class="co-group-label">Basic Details</div>
+                <div class="co-row">
+                  <div class="co-field">
+                    <label for="pf-firstName">First Name</label>
+                    <div class="co-field__wrap">
+                      <i class="fas fa-user co-field__icon"></i>
+                      <input type="text" id="pf-firstName" value="Kasun" autocomplete="given-name" />
+                    </div>
+                  </div>
+                  <div class="co-field">
+                    <label for="pf-lastName">Last Name</label>
+                    <div class="co-field__wrap">
+                      <i class="fas fa-user co-field__icon"></i>
+                      <input type="text" id="pf-lastName" value="Perera" autocomplete="family-name" />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="co-group-label">Contact</div>
+                <div class="co-row">
+                  <div class="co-field">
+                    <label for="pf-email">Email Address</label>
+                    <div class="co-field__wrap">
+                      <i class="fas fa-envelope co-field__icon"></i>
+                      <input type="email" id="pf-email" value="kasun.perera@example.com" autocomplete="email" />
+                    </div>
+                  </div>
+                  <div class="co-field">
+                    <label for="pf-phone">Phone / WhatsApp</label>
+                    <div class="co-field__wrap">
+                      <i class="fas fa-phone co-field__icon"></i>
+                      <input type="tel" id="pf-phone" value="+94 77 123 4567" autocomplete="tel" />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="co-group-label">Additional <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">(optional)</span></div>
+                <div class="co-row">
+                  <div class="co-field">
+                    <label for="pf-dob">Date of Birth</label>
+                    <div class="co-field__wrap">
+                      <i class="fas fa-birthday-cake co-field__icon"></i>
+                      <input type="date" id="pf-dob" value="1990-06-15" autocomplete="bday" />
+                    </div>
+                  </div>
+                  <div class="co-field">
+                    <label for="pf-gender">Gender</label>
+                    <div class="co-field__wrap">
+                      <i class="fas fa-venus-mars co-field__icon"></i>
+                      <select id="pf-gender">
+                        <option value="">Prefer not to say</option>
+                        <option value="male" selected>Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="profile-save-row">
+                  <button type="submit" class="btn btn-primary" style="height:46px;padding:0 28px;font-size:12px;letter-spacing:1.5px;">
+                    <i class="fas fa-save"></i> &nbsp;Save Changes
+                  </button>
+                  <div class="profile-saved-msg" id="personalSavedMsg">
+                    <i class="fas fa-check-circle"></i> Changes saved successfully
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- PANEL: Change Password -->
+        <div class="profile-panel" id="panelPassword">
+          <div class="profile-card">
+            <div class="profile-card__head">
+              <div class="profile-card__title">
+                <i class="fas fa-lock"></i> Change Password
+              </div>
+            </div>
+            <div class="profile-card__body">
+              <form class="co-form" id="passwordForm" novalidate>
+                <div class="co-field">
+                  <label for="pf-curPwd">Current Password</label>
+                  <div class="co-field__wrap">
+                    <i class="fas fa-lock co-field__icon"></i>
+                    <input type="password" id="pf-curPwd" placeholder="Enter current password" autocomplete="current-password" />
+                    <button type="button" class="auth-field__toggle" data-toggle="pf-curPwd"><i class="far fa-eye"></i></button>
+                  </div>
+                </div>
+                <div class="co-field">
+                  <label for="pf-newPwd">New Password</label>
+                  <div class="co-field__wrap">
+                    <i class="fas fa-lock co-field__icon"></i>
+                    <input type="password" id="pf-newPwd" placeholder="Create a new password" autocomplete="new-password" />
+                    <button type="button" class="auth-field__toggle" data-toggle="pf-newPwd"><i class="far fa-eye"></i></button>
+                  </div>
+                  <div class="auth-strength"><div class="auth-strength__fill" id="pwdStrengthFill"></div></div>
+                  <span class="auth-field__hint" id="pwdStrengthHint"></span>
+                </div>
+                <div class="co-field">
+                  <label for="pf-confirmPwd">Confirm New Password</label>
+                  <div class="co-field__wrap">
+                    <i class="fas fa-lock co-field__icon"></i>
+                    <input type="password" id="pf-confirmPwd" placeholder="Repeat new password" autocomplete="new-password" />
+                    <button type="button" class="auth-field__toggle" data-toggle="pf-confirmPwd"><i class="far fa-eye"></i></button>
+                  </div>
+                  <span class="auth-field__hint" id="pwdMatchHint"></span>
+                </div>
+                <div class="profile-save-row">
+                  <button type="submit" class="btn btn-primary" style="height:44px;padding:0 24px;font-size:12px;">
+                    <i class="fas fa-key"></i> &nbsp;Update Password
+                  </button>
+                  <div class="profile-saved-msg" id="passwordSavedMsg">
+                    <i class="fas fa-check-circle"></i> Password updated
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- PANEL: Saved Addresses  -->
+        <div class="profile-panel" id="panelAddresses">
+          <div class="profile-card">
+            <div class="profile-card__head">
+              <div class="profile-card__title">
+                <i class="fas fa-map-marker-alt"></i> Saved Addresses
+              </div>
+            </div>
+            <div class="profile-card__body">
+              <div class="address-grid">
+
+                <!-- Address 1 — Default -->
+                <div class="address-item default">
+                  <div class="address-item__badge"><i class="fas fa-check-circle"></i> Default</div>
+                  <div class="address-item__text">
+                    <strong>Kasun Perera</strong>
+                    45 Galle Road, Apt 3A<br />
+                    Colombo, Colombo District<br />
+                    Sri Lanka<br />
+                    +94 77 123 4567
+                  </div>
+                  <div class="address-item__actions">
+                    <button class="address-btn" type="button"><i class="fas fa-edit"></i> Edit</button>
+                    <button class="address-btn address-btn--danger" type="button"><i class="fas fa-trash-alt"></i> Remove</button>
+                  </div>
+                </div>
+
+                <!-- Address 2 -->
+                <div class="address-item">
+                  <div class="address-item__text">
+                    <strong>Kasun Perera</strong>
+                    12 Station Road<br />
+                    Kandy, Kandy District<br />
+                    Sri Lanka
+                  </div>
+                  <div class="address-item__actions">
+                    <button class="address-btn" type="button"><i class="fas fa-home"></i> Set Default</button>
+                    <button class="address-btn" type="button"><i class="fas fa-edit"></i> Edit</button>
+                    <button class="address-btn address-btn--danger" type="button"><i class="fas fa-trash-alt"></i></button>
+                  </div>
+                </div>
+
+                <!-- Add new -->
+                <button class="address-add" type="button" id="addAddressBtn">
+                  <i class="fas fa-plus-circle"></i>
+                  <span>Add New Address</span>
+                </button>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- PANEL: Preferences -->
+        <div class="profile-panel" id="panelPreferences">
+          <div class="profile-card">
+            <div class="profile-card__head">
+              <div class="profile-card__title">
+                <i class="fas fa-bell"></i> Notifications
+              </div>
+            </div>
+            <div class="profile-card__body">
+              <div class="pref-row">
+                <div class="pref-row__info">
+                  <strong>New Arrival Alerts</strong>
+                  <span>Get notified when new gemstones are added</span>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" checked />
+                  <span class="toggle-switch__track"></span>
+                </label>
+              </div>
+              <div class="pref-row">
+                <div class="pref-row__info">
+                  <strong>Order Status Updates</strong>
+                  <span>Updates on your order shipment and delivery</span>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" checked />
+                  <span class="toggle-switch__track"></span>
+                </label>
+              </div>
+              <div class="pref-row">
+                <div class="pref-row__info">
+                  <strong>Newsletter &amp; Promotions</strong>
+                  <span>Exclusive offers and gemstone insights</span>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" checked />
+                  <span class="toggle-switch__track"></span>
+                </label>
+              </div>
+              <div class="pref-row">
+                <div class="pref-row__info">
+                  <strong>Wishlist Price Drops</strong>
+                  <span>Alert when a wishlisted gem is discounted</span>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" />
+                  <span class="toggle-switch__track"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="profile-card">
+            <div class="profile-card__head">
+              <div class="profile-card__title">
+                <i class="fas fa-paint-brush"></i> Display
+              </div>
+            </div>
+            <div class="profile-card__body">
+              <div class="pref-row">
+                <div class="pref-row__info">
+                  <strong>Default Currency</strong>
+                  <span>Prices shown across the site</span>
+                </div>
+                <div class="co-field" style="width:130px;margin:0;">
+                  <div class="co-field__wrap">
+                    <i class="fas fa-dollar-sign co-field__icon"></i>
+                    <select id="pf-currency" style="padding-left:32px;">
+                      <option value="USD" selected>USD ($)</option>
+                      <option value="LKR">LKR (Rs.)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="pref-row">
+                <div class="pref-row__info">
+                  <strong>Language</strong>
+                  <span>Interface language preference</span>
+                </div>
+                <div class="co-field" style="width:130px;margin:0;">
+                  <div class="co-field__wrap">
+                    <i class="fas fa-globe co-field__icon"></i>
+                    <select id="pf-lang" style="padding-left:32px;">
+                      <option value="en" selected>English</option>
+                      <option value="si">සිංහල</option>
+                      <option value="ta">தமிழ்</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="profile-card" style="border-color:#fce4ec;">
+            <div class="profile-card__head" style="background:#fff5f5;">
+              <div class="profile-card__title" style="color:#c62828;">
+                <i class="fas fa-exclamation-triangle" style="color:#e74c3c;"></i> Danger Zone
+              </div>
+            </div>
+            <div class="profile-card__body">
+              <div class="pref-row" style="border:none;padding-top:0;">
+                <div class="pref-row__info">
+                  <strong>Delete Account</strong>
+                  <span>Permanently remove your account and all data. This cannot be undone.</span>
+                </div>
+                <button class="btn" type="button" style="height:38px;padding:0 18px;font-size:11px;background:#fff5f5;border-color:#e74c3c;color:#e74c3c;flex-shrink:0;" id="deleteAccountBtn">
+                  Delete Account
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- SHARED FOOTER -->
+<div id="mc-footer"></div>
+
+<!-- Scripts -->
+<script src="assets/js/includes.js"></script>
+<script src="assets/js/main.js"></script>
+<script src="assets/js/profile.js"></script>
+</body>
+</html>

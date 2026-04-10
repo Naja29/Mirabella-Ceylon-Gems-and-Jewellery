@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Your shopping cart — Mirabella Ceylon Gems & Jewellery. Review your selected gemstones and proceed to checkout." />
+  <title>Shopping Cart | Mirabella Ceylon</title>
+
+  <link rel="icon" type="image/png" href="assets/images/favicon.png" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Lato:wght@300;400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet" />
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <link rel="stylesheet" href="assets/css/cart.css" />
+</head>
+<body class="page-loading" data-page="cart" data-header="solid">
+
+<!-- PAGE LOADER -->
+<div class="page-loader" id="pageLoader">
+  <div class="loader-logo">
+    <img src="assets/images/logo.png" alt="Mirabella Ceylon" />
+  </div>
+  <div class="loader-bar"><div class="loader-bar__fill"></div></div>
+</div>
+
+<!-- SHARED HEADER  -->
+<div id="mc-header"></div>
+
+
+<!-- BREADCRUMB BAR -->
+<div class="cart-breadcrumb-bar">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="index.html"><i class="fas fa-home"></i> Home</a>
+      <span class="breadcrumb__sep"><i class="fas fa-chevron-right"></i></span>
+      <a href="shop.html">Collections</a>
+      <span class="breadcrumb__sep"><i class="fas fa-chevron-right"></i></span>
+      <span>Shopping Cart</span>
+    </nav>
+  </div>
+</div>
+
+
+<!-- CART SECTION -->
+<section class="cart-section">
+  <div class="container">
+
+    <div class="cart-page-header">
+      <h1 class="cart-page-title">Shopping Cart</h1>
+      <span class="cart-page-count" id="cartItemCount">3 items</span>
+    </div>
+
+    <!-- CART LAYOUT  -->
+    <div class="cart-layout" id="cartLayout">
+
+      <!-- LEFT: Items -->
+      <div class="cart-items" id="cartItems">
+
+        <!-- Cart Item 1 -->
+        <div class="cart-item" data-id="1" data-price="12500">
+          <a href="product-detail.html" class="cart-item__img">
+            <img src="assets/images/prod-1.jpg" alt="Royal Blue Ceylon Sapphire" />
+          </a>
+          <div class="cart-item__body">
+            <div class="cart-item__top">
+              <div>
+                <div class="cart-item__cat">Blue Sapphires</div>
+                <a href="product-detail.html" class="cart-item__name">Royal Blue Ceylon Sapphire — 4.82ct</a>
+                <div class="cart-item__specs">
+                  <span><i class="fas fa-gem"></i> 4.82 ct</span>
+                  <span><i class="fas fa-cut"></i> Oval Brilliant</span>
+                  <span><i class="fas fa-certificate"></i> GIA Certified</span>
+                  <span><i class="fas fa-fire-alt"></i> Unheated</span>
+                </div>
+              </div>
+              <button class="cart-item__remove" data-remove="1" aria-label="Remove item">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+            <div class="cart-item__bottom">
+              <div class="cart-item__qty">
+                <button class="cart-qty__btn" data-action="minus" data-id="1" aria-label="Decrease"><i class="fas fa-minus"></i></button>
+                <span class="cart-qty__val" id="qty-1">1</span>
+                <button class="cart-qty__btn" data-action="plus"  data-id="1" aria-label="Increase"><i class="fas fa-plus"></i></button>
+              </div>
+              <div class="cart-item__price" id="price-1">$12,500</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cart Item 2 -->
+        <div class="cart-item" data-id="2" data-price="18500">
+          <a href="product-detail.html" class="cart-item__img">
+            <img src="assets/images/prod-3.jpg" alt="Padparadscha Sapphire" />
+          </a>
+          <div class="cart-item__body">
+            <div class="cart-item__top">
+              <div>
+                <div class="cart-item__cat">Padparadscha</div>
+                <a href="product-detail.html" class="cart-item__name">Padparadscha Sapphire — 2.75ct</a>
+                <div class="cart-item__specs">
+                  <span><i class="fas fa-gem"></i> 2.75 ct</span>
+                  <span><i class="fas fa-cut"></i> Cushion</span>
+                  <span><i class="fas fa-certificate"></i> GIA Certified</span>
+                  <span><i class="fas fa-fire-alt"></i> Unheated</span>
+                </div>
+              </div>
+              <button class="cart-item__remove" data-remove="2" aria-label="Remove item">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+            <div class="cart-item__bottom">
+              <div class="cart-item__qty">
+                <button class="cart-qty__btn" data-action="minus" data-id="2" aria-label="Decrease"><i class="fas fa-minus"></i></button>
+                <span class="cart-qty__val" id="qty-2">1</span>
+                <button class="cart-qty__btn" data-action="plus"  data-id="2" aria-label="Increase"><i class="fas fa-plus"></i></button>
+              </div>
+              <div class="cart-item__price" id="price-2">$18,500</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cart Item 3 -->
+        <div class="cart-item" data-id="3" data-price="7200">
+          <a href="product-detail.html" class="cart-item__img">
+            <img src="assets/images/prod-4.jpg" alt="Blue Star Sapphire" />
+          </a>
+          <div class="cart-item__body">
+            <div class="cart-item__top">
+              <div>
+                <div class="cart-item__cat">Star Sapphires</div>
+                <a href="product-detail.html" class="cart-item__name">Blue Star Sapphire — 6.50ct</a>
+                <div class="cart-item__specs">
+                  <span><i class="fas fa-gem"></i> 6.50 ct</span>
+                  <span><i class="fas fa-cut"></i> Cabochon</span>
+                  <span><i class="fas fa-certificate"></i> GRS Certified</span>
+                  <span><i class="fas fa-map-marker-alt"></i> Sri Lanka</span>
+                </div>
+              </div>
+              <button class="cart-item__remove" data-remove="3" aria-label="Remove item">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+            <div class="cart-item__bottom">
+              <div class="cart-item__qty">
+                <button class="cart-qty__btn" data-action="minus" data-id="3" aria-label="Decrease"><i class="fas fa-minus"></i></button>
+                <span class="cart-qty__val" id="qty-3">1</span>
+                <button class="cart-qty__btn" data-action="plus"  data-id="3" aria-label="Increase"><i class="fas fa-plus"></i></button>
+              </div>
+              <div class="cart-item__price" id="price-3">$7,200</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Continue Shopping -->
+        <div class="cart-continue">
+          <a href="shop.html" class="cart-continue__link">
+            <i class="fas fa-arrow-left"></i> Continue Shopping
+          </a>
+        </div>
+
+      </div>
+      <!-- END ITEMS -->
+
+
+      <!-- RIGHT: Summary -->
+      <aside class="cart-summary" id="cartSummary">
+
+        <h2 class="cart-summary__title">Order Summary</h2>
+
+        <!-- Promo code -->
+        <div class="cart-promo">
+          <label class="cart-promo__label" for="promoCode">Promo Code</label>
+          <div class="cart-promo__row">
+            <input type="text" id="promoCode" class="cart-promo__input" placeholder="Enter code…" />
+            <button class="cart-promo__btn" id="applyPromo">Apply</button>
+          </div>
+          <p class="cart-promo__msg" id="promoMsg"></p>
+        </div>
+
+        <!-- Totals -->
+        <div class="cart-totals">
+          <div class="cart-total-row">
+            <span>Subtotal (<span id="summaryCount">3</span> items)</span>
+            <span id="subtotalVal">$38,200</span>
+          </div>
+          <div class="cart-total-row" id="discountRow" style="display:none;">
+            <span class="cart-total-row--discount">Discount</span>
+            <span class="cart-total-row--discount" id="discountVal">−$0</span>
+          </div>
+          <div class="cart-total-row">
+            <span>Shipping</span>
+            <span class="cart-total-free">Free</span>
+          </div>
+          <div class="cart-total-row">
+            <span>Estimated Tax</span>
+            <span id="taxVal">$0</span>
+          </div>
+        </div>
+
+        <div class="cart-grand-total">
+          <span>Total</span>
+          <span id="grandTotalVal">$38,200</span>
+        </div>
+
+        <button class="btn btn--gold cart-checkout-btn" id="checkoutBtn">
+          <i class="fas fa-lock"></i> Proceed to Checkout
+        </button>
+
+        <div class="cart-payment-icons">
+          <i class="fab fa-cc-visa"       title="Visa"></i>
+          <i class="fab fa-cc-mastercard" title="Mastercard"></i>
+          <i class="fab fa-cc-paypal"     title="PayPal"></i>
+          <i class="fab fa-cc-amex"       title="Amex"></i>
+        </div>
+
+        <div class="cart-summary-trust">
+          <div class="cart-trust-item">
+            <i class="fas fa-shield-alt"></i>
+            <span>Secure Checkout</span>
+          </div>
+          <div class="cart-trust-item">
+            <i class="fas fa-undo-alt"></i>
+            <span>14-Day Returns</span>
+          </div>
+          <div class="cart-trust-item">
+            <i class="fas fa-globe"></i>
+            <span>Free Worldwide Shipping</span>
+          </div>
+          <div class="cart-trust-item">
+            <i class="fas fa-certificate"></i>
+            <span>Certified Gemstones</span>
+          </div>
+        </div>
+
+      </aside>
+      <!-- END SUMMARY -->
+
+    </div>
+    <!-- END LAYOUT -->
+
+
+    <!-- EMPTY CART STATE -->
+    <div class="cart-empty" id="cartEmpty" style="display:none;">
+      <div class="cart-empty__icon"><i class="fas fa-shopping-bag"></i></div>
+      <h2 class="cart-empty__title">Your cart is empty</h2>
+      <p class="cart-empty__text">You haven't added any gemstones yet. Explore our collections and find something extraordinary.</p>
+      <a href="shop.html" class="btn btn--gold">
+        <i class="fas fa-gem"></i> Explore Collections
+      </a>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- YOU MAY ALSO LIKE -->
+<section class="cart-related">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="eyebrow">Handpicked for You</div>
+      <h2 class="section-title">You May Also Like</h2>
+    </div>
+    <div class="products__grid cart-related__grid reveal">
+
+      <article class="product-card" data-cat="cats-eye" data-price="6500">
+        <div class="product-card__img">
+          <img src="assets/images/prod-3.jpg" alt="Alexandrite Cat's Eye" loading="lazy" />
+          <span class="product-badge product-badge--gold">Rare Find</span>
+          <button class="product-card__wishlist" aria-label="Wishlist"><i class="far fa-heart"></i></button>
+          <div class="product-card__overlay">
+            <button class="btn-quickview"><i class="fas fa-eye"></i> Quick View</button>
+          </div>
+        </div>
+        <div class="product-card__info">
+          <div class="product-card__cat">Cat's Eye</div>
+          <h3 class="product-card__name">Alexandrite Cat's Eye — 1.5ct</h3>
+          <div class="product-card__rating">
+            <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+            <span class="rating-count">(5)</span>
+          </div>
+          <div class="product-card__footer">
+            <div class="product-card__price">$6,500</div>
+            <button class="btn-cart" data-action="add-to-cart"><i class="fas fa-shopping-bag"></i> Add</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="product-card" data-cat="ruby" data-price="14000">
+        <div class="product-card__img">
+          <img src="assets/images/prod-1.jpg" alt="Natural Ruby" loading="lazy" />
+          <span class="product-badge product-badge--dark">Exclusive</span>
+          <button class="product-card__wishlist" aria-label="Wishlist"><i class="far fa-heart"></i></button>
+          <div class="product-card__overlay">
+            <button class="btn-quickview"><i class="fas fa-eye"></i> Quick View</button>
+          </div>
+        </div>
+        <div class="product-card__info">
+          <div class="product-card__cat">Rubies</div>
+          <h3 class="product-card__name">Natural Ruby — 2.20ct Pigeon Blood</h3>
+          <div class="product-card__rating">
+            <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+            <span class="rating-count">(9)</span>
+          </div>
+          <div class="product-card__footer">
+            <div class="product-card__price">$14,000</div>
+            <button class="btn-cart" data-action="add-to-cart"><i class="fas fa-shopping-bag"></i> Add</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="product-card" data-cat="jewellery" data-price="4800">
+        <div class="product-card__img">
+          <img src="assets/images/prod-2.jpg" alt="White Gold Necklace" loading="lazy" />
+          <span class="product-badge product-badge--dark">New Arrival</span>
+          <button class="product-card__wishlist" aria-label="Wishlist"><i class="far fa-heart"></i></button>
+          <div class="product-card__overlay">
+            <button class="btn-quickview"><i class="fas fa-eye"></i> Quick View</button>
+          </div>
+        </div>
+        <div class="product-card__info">
+          <div class="product-card__cat">Jewellery</div>
+          <h3 class="product-card__name">18K White Gold Diamond Necklace</h3>
+          <div class="product-card__rating">
+            <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i></div>
+            <span class="rating-count">(3)</span>
+          </div>
+          <div class="product-card__footer">
+            <div class="product-card__price">$4,800</div>
+            <button class="btn-cart" data-action="add-to-cart"><i class="fas fa-shopping-bag"></i> Add</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="product-card" data-cat="sapphire" data-price="9800">
+        <div class="product-card__img">
+          <img src="assets/images/prod-2.jpg" alt="Cornflower Blue Sapphire" loading="lazy" />
+          <button class="product-card__wishlist" aria-label="Wishlist"><i class="far fa-heart"></i></button>
+          <div class="product-card__overlay">
+            <button class="btn-quickview"><i class="fas fa-eye"></i> Quick View</button>
+          </div>
+        </div>
+        <div class="product-card__info">
+          <div class="product-card__cat">Blue Sapphires</div>
+          <h3 class="product-card__name">Cornflower Blue Sapphire — 3.10ct</h3>
+          <div class="product-card__rating">
+            <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+            <span class="rating-count">(8)</span>
+          </div>
+          <div class="product-card__footer">
+            <div class="product-card__price">$9,800</div>
+            <button class="btn-cart" data-action="add-to-cart"><i class="fas fa-shopping-bag"></i> Add</button>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- SHARED FOOTER -->
+<div id="mc-footer"></div>
+
+<script src="assets/js/includes.js"></script>
+<script src="assets/js/main.js"></script>
+<script src="assets/js/cart.js"></script>
+</body>
+</html>
