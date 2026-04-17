@@ -573,6 +573,105 @@ const ProductLinks = (() => {
 })();
 
 
+/* Testimonials Slider */
+const TestimonialsSlider = (() => {
+  const AUTOPLAY_MS  = 5000;
+  const VISIBLE_DESK = 3;   // cards visible on desktop
+  const VISIBLE_MOB  = 1;   // cards visible on mobile
+
+  function init() {
+    const slider = document.getElementById('testimonialsSlider');
+    if (!slider) return;
+
+    const track   = document.getElementById('testimonialsTrack');
+    const dotsWrap = document.getElementById('testimonialsDots');
+    const prevBtn  = document.getElementById('tPrev');
+    const nextBtn  = document.getElementById('tNext');
+    if (!track) return;
+
+    const cards = Array.from(track.children);
+    const total = cards.length;
+    let current  = 0;
+    let timer    = null;
+
+    function visibleCount() {
+      return window.innerWidth <= 768 ? VISIBLE_MOB : VISIBLE_DESK;
+    }
+
+    function maxIndex() {
+      return Math.max(0, total - visibleCount());
+    }
+
+    /* Build dots */
+    function buildDots() {
+      if (!dotsWrap) return;
+      dotsWrap.innerHTML = '';
+      const count = maxIndex() + 1;
+      for (let i = 0; i < count; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'testimonials__dot' + (i === current ? ' active' : '');
+        btn.setAttribute('aria-label', 'Go to review ' + (i + 1));
+        btn.addEventListener('click', () => goTo(i));
+        dotsWrap.appendChild(btn);
+      }
+    }
+
+    function updateDots() {
+      if (!dotsWrap) return;
+      dotsWrap.querySelectorAll('.testimonials__dot').forEach((d, i) => {
+        d.classList.toggle('active', i === current);
+      });
+    }
+
+    function goTo(index) {
+      current = Math.max(0, Math.min(index, maxIndex()));
+      const cardWidth = cards[0].getBoundingClientRect().width + 24; // +gap
+      track.style.transform = `translateX(-${current * cardWidth}px)`;
+      updateDots();
+    }
+
+    function next() { goTo(current >= maxIndex() ? 0 : current + 1); }
+    function prev() { goTo(current <= 0 ? maxIndex() : current - 1); }
+
+    function startAutoplay() {
+      stopAutoplay();
+      timer = setInterval(next, AUTOPLAY_MS);
+    }
+    function stopAutoplay() {
+      if (timer) { clearInterval(timer); timer = null; }
+    }
+
+    /* Arrow buttons */
+    prevBtn && prevBtn.addEventListener('click', () => { prev(); startAutoplay(); });
+    nextBtn && nextBtn.addEventListener('click', () => { next(); startAutoplay(); });
+
+    /* Pause on hover */
+    slider.addEventListener('mouseenter', stopAutoplay);
+    slider.addEventListener('mouseleave', startAutoplay);
+
+    /* Touch swipe */
+    let touchStartX = 0;
+    track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+    track.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(dx) > 40) { dx < 0 ? next() : prev(); startAutoplay(); }
+    }, { passive: true });
+
+    /* Recalculate on resize */
+    window.addEventListener('resize', () => {
+      buildDots();
+      goTo(Math.min(current, maxIndex()));
+    });
+
+    buildDots();
+    goTo(0);
+    startAutoplay();
+  }
+
+  return { init };
+})();
+
+
 /* Boot */
 
 /* Loader runs immediately — the #pageLoader div is hardcoded in
@@ -601,6 +700,7 @@ document.addEventListener('mc:ready', () => {
   ProductLinks.init();
   AccountDropdown.init();
   SearchOverlay.init();
+  TestimonialsSlider.init();
 });
 
 

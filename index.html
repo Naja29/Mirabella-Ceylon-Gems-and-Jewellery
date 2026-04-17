@@ -49,7 +49,7 @@
         </p>
         <div class="slide__actions">
           <a href="shop.html" class="btn btn--gold"><i class="fas fa-gem"></i> Explore Collection</a>
-          <a href="about.html" class="btn btn--outline-white">Our Story</a>
+          <a href="#about" class="btn btn--outline-white">Our Story</a>
         </div>
       </div>
     </div>
@@ -407,7 +407,6 @@
           <div class="about__feature"><i class="fas fa-check-circle"></i><span>Expert Gem Consultation</span></div>
           <div class="about__feature"><i class="fas fa-check-circle"></i><span>Buyback Guarantee</span></div>
         </div>
-        <a href="about.html" class="btn btn--gold">Learn More <i class="fas fa-arrow-right"></i></a>
         <div class="director-sig">
           <div class="director-sig__avatar">
             <img src="assets/images/director.jpg" alt="Chamodhya" onerror="this.outerHTML='<i class=\'fas fa-user\'></i>'" />
@@ -493,46 +492,87 @@
       <h2 class="section-title title-shine">What Our Clients Say</h2>
       <p class="section-sub">Trusted by collectors, jewellers and gem lovers across the world.</p>
     </div>
-    <div class="testimonials__grid">
+    <!-- Slider wrapper -->
+    <div class="testimonials__slider reveal" id="testimonialsSlider">
 
-      <div class="testimonial-card reveal reveal-delay-1">
-        <div class="testimonial-card__quote">"</div>
-        <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-        <p class="testimonial-card__text">The blue sapphire I purchased was absolutely stunning. The certification, packaging, and communication were all first class. Will definitely buy again.</p>
-        <div class="testimonial-card__reviewer">
-          <div class="reviewer__avatar"><i class="fas fa-user"></i></div>
-          <div>
-            <div class="reviewer__name">James H.</div>
-            <div class="reviewer__location">United Kingdom</div>
+      <button class="testimonials__arrow testimonials__arrow--prev" id="tPrev" aria-label="Previous review">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <button class="testimonials__arrow testimonials__arrow--next" id="tNext" aria-label="Next review">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+
+      <div class="testimonials__track" id="testimonialsTrack">
+
+        <div class="testimonial-card">
+          <div class="testimonial-card__quote">"</div>
+          <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+          <p class="testimonial-card__text">The blue sapphire I purchased was absolutely stunning. The certification, packaging, and communication were all first class. Will definitely buy again.</p>
+          <div class="testimonial-card__reviewer">
+            <div class="reviewer__avatar"><i class="fas fa-user"></i></div>
+            <div>
+              <div class="reviewer__name">James H.</div>
+              <div class="reviewer__location">United Kingdom</div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="testimonial-card reveal reveal-delay-2">
-        <div class="testimonial-card__quote">"</div>
-        <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-        <p class="testimonial-card__text">Mirabella Ceylon is my go-to source for authentic padparadscha sapphires. The quality is unmatched and Chamodhya's personal attention is outstanding.</p>
-        <div class="testimonial-card__reviewer">
-          <div class="reviewer__avatar"><i class="fas fa-user"></i></div>
-          <div>
-            <div class="reviewer__name">Yuki T.</div>
-            <div class="reviewer__location">Japan</div>
+        <div class="testimonial-card">
+          <div class="testimonial-card__quote">"</div>
+          <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+          <p class="testimonial-card__text">Mirabella Ceylon is my go-to source for authentic padparadscha sapphires. The quality is unmatched and Chamodhya's personal attention is outstanding.</p>
+          <div class="testimonial-card__reviewer">
+            <div class="reviewer__avatar"><i class="fas fa-user"></i></div>
+            <div>
+              <div class="reviewer__name">Yuki T.</div>
+              <div class="reviewer__location">Japan</div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="testimonial-card reveal reveal-delay-3">
-        <div class="testimonial-card__quote">"</div>
-        <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div>
-        <p class="testimonial-card__text">I commissioned a custom ring and the result exceeded all my expectations. The gem is breathtaking and the craftsmanship is truly world class.</p>
-        <div class="testimonial-card__reviewer">
-          <div class="reviewer__avatar"><i class="fas fa-user"></i></div>
-          <div>
-            <div class="reviewer__name">Priya M.</div>
-            <div class="reviewer__location">Australia</div>
+        <div class="testimonial-card">
+          <div class="testimonial-card__quote">"</div>
+          <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div>
+          <p class="testimonial-card__text">I commissioned a custom ring and the result exceeded all my expectations. The gem is breathtaking and the craftsmanship is truly world class.</p>
+          <div class="testimonial-card__reviewer">
+            <div class="reviewer__avatar"><i class="fas fa-user"></i></div>
+            <div>
+              <div class="reviewer__name">Priya M.</div>
+              <div class="reviewer__location">Australia</div>
+            </div>
           </div>
         </div>
+
+        <div class="testimonial-card">
+          <div class="testimonial-card__quote">"</div>
+          <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+          <p class="testimonial-card__text">Excellent service from start to finish. My alexandrite arrived beautifully packaged with all documents. The colour change is spectacular — exactly as described.</p>
+          <div class="testimonial-card__reviewer">
+            <div class="reviewer__avatar"><i class="fas fa-user"></i></div>
+            <div>
+              <div class="reviewer__name">Marcus L.</div>
+              <div class="reviewer__location">Germany</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
+          <div class="testimonial-card__quote">"</div>
+          <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+          <p class="testimonial-card__text">I have bought from dealers worldwide and Mirabella Ceylon stands out for their honesty and transparency. The NGJA certificate gave me complete peace of mind.</p>
+          <div class="testimonial-card__reviewer">
+            <div class="reviewer__avatar"><i class="fas fa-user"></i></div>
+            <div>
+              <div class="reviewer__name">Sophia R.</div>
+              <div class="reviewer__location">United States</div>
+            </div>
+          </div>
+        </div>
+
       </div>
+
+      <!-- Dots -->
+      <div class="testimonials__dots" id="testimonialsDots"></div>
 
     </div>
   </div>

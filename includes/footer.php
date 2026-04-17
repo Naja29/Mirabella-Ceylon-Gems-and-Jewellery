@@ -1,3 +1,24 @@
+<?php
+/**
+ * Mirabella Ceylon — Shared Footer
+ * includes/footer.php
+ *
+ * Set these variables BEFORE including this file (optional):
+ *   $extraJS (array) — extra JS files, e.g. ['assets/js/shop.js']
+ *
+ * Example:
+ *   <?php
+ *     $extraJS = ['assets/js/shop.js'];
+ *     include 'includes/footer.php';
+ *   ?>
+ */
+
+$extraJS = $extraJS ?? [];
+?>
+
+<!-- ══════════════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════════════════ -->
 <footer class="site-footer" role="contentinfo">
   <div class="container">
     <div class="footer__grid">
@@ -23,23 +44,22 @@
       <div>
         <h4 class="footer__col-title">Quick Links</h4>
         <ul class="footer__links">
-          <li><a href="index.html"><i class="fas fa-chevron-right"></i> Home</a></li>
-          <li><a href="shop.html"><i class="fas fa-chevron-right"></i> Collections</a></li>
-          <li><a href="index.html#about"><i class="fas fa-chevron-right"></i> About Us</a></li>
-          <li><a href="contact.html"><i class="fas fa-chevron-right"></i> Contact</a></li>
-          <li><a href="refund-policy.html"><i class="fas fa-chevron-right"></i> Refund &amp; Returns</a></li>
-          <li><a href="cart.html"><i class="fas fa-chevron-right"></i> Shopping Cart</a></li>
+          <li><a href="index.php"><i class="fas fa-chevron-right"></i> Home</a></li>
+          <li><a href="shop.php"><i class="fas fa-chevron-right"></i> Collections</a></li>
+          <li><a href="index.php#about"><i class="fas fa-chevron-right"></i> About Us</a></li>
+          <li><a href="index.php#contact"><i class="fas fa-chevron-right"></i> Contact</a></li>
+          <li><a href="cart.php"><i class="fas fa-chevron-right"></i> Shopping Cart</a></li>
         </ul>
       </div>
 
       <div>
         <h4 class="footer__col-title">Gemstones</h4>
         <ul class="footer__links">
-          <li><a href="shop.html?cat=sapphire"><i class="fas fa-chevron-right"></i> Blue Sapphires</a></li>
-          <li><a href="shop.html?cat=padparadscha"><i class="fas fa-chevron-right"></i> Padparadscha</a></li>
-          <li><a href="shop.html?cat=cats-eye"><i class="fas fa-chevron-right"></i> Cat's Eye</a></li>
-          <li><a href="shop.html?cat=ruby"><i class="fas fa-chevron-right"></i> Natural Rubies</a></li>
-          <li><a href="shop.html?cat=star-sapphire"><i class="fas fa-chevron-right"></i> Star Sapphires</a></li>
+          <li><a href="shop.php?cat=sapphire"><i class="fas fa-chevron-right"></i> Blue Sapphires</a></li>
+          <li><a href="shop.php?cat=padparadscha"><i class="fas fa-chevron-right"></i> Padparadscha</a></li>
+          <li><a href="shop.php?cat=cats-eye"><i class="fas fa-chevron-right"></i> Cat's Eye</a></li>
+          <li><a href="shop.php?cat=ruby"><i class="fas fa-chevron-right"></i> Natural Rubies</a></li>
+          <li><a href="shop.php?cat=star-sapphire"><i class="fas fa-chevron-right"></i> Star Sapphires</a></li>
         </ul>
       </div>
 
@@ -51,7 +71,7 @@
         </div>
         <div class="footer__contact-item">
           <i class="fas fa-phone"></i>
-          <span><a href="tel:+94718456999">+94 71 845 6999</a></span>
+          <span><a href="tel:+94771234567">+94 77 123 4567</a></span>
         </div>
         <div class="footer__contact-item">
           <i class="fas fa-envelope"></i>
@@ -59,7 +79,7 @@
         </div>
         <div class="footer__contact-item">
           <i class="fab fa-whatsapp"></i>
-          <span><a href="https://wa.me/94718456999" target="_blank">Chat on WhatsApp</a></span>
+          <span><a href="#">Chat on WhatsApp</a></span>
         </div>
       </div>
 
@@ -67,23 +87,25 @@
 
     <div class="footer__bottom">
       <p class="footer__copy">
-        &copy; <span class="footer__year"></span> Mirabella Ceylon. All rights reserved.
+        &copy; <?= date('Y') ?> Mirabella Ceylon. All rights reserved.
         &nbsp;&nbsp;|&nbsp;&nbsp;
         Designed by <a href="https://www.asseminate.com/" target="_blank" rel="noopener noreferrer">Asseminate</a>
       </p>
       <div class="footer__legal">
-        <a href="privacy-policy.html">Privacy Policy</a>
+        <a href="privacy-policy.php">Privacy Policy</a>
         <span class="footer__legal-sep">|</span>
-        <a href="refund-policy.html">Refund &amp; Returns</a>
+        <a href="cookies-policy.php">Cookies Policy</a>
         <span class="footer__legal-sep">|</span>
-        <a href="terms.html">Terms &amp; Conditions</a>
+        <a href="terms.php">Terms &amp; Conditions</a>
       </div>
     </div>
   </div>
 </footer>
 
 
-<!-- COOKIE CONSENT BANNER-->
+<!-- ══════════════════════════════════════════════════════
+     COOKIE CONSENT BANNER
+═══════════════════════════════════════════════════════════ -->
 <div class="cookie-banner" id="cookieBanner" role="dialog" aria-label="Cookie consent" aria-live="polite">
   <div class="cookie-banner__inner">
     <div class="cookie-banner__icon"><i class="fas fa-cookie-bite"></i></div>
@@ -92,7 +114,7 @@
       <p class="cookie-banner__text">
         We use cookies to enhance your browsing experience, personalise content, and analyse our traffic.
         By clicking <strong>"Accept All"</strong> you consent to our use of cookies.
-        Read our <a href="privacy-policy.html">Privacy Policy</a> for more information.
+        Read our <a href="cookies-policy.php">Cookies Policy</a> for more information.
       </p>
     </div>
     <div class="cookie-banner__actions">
@@ -159,3 +181,14 @@
 </div>
 
 <button id="scrollToTop" aria-label="Back to top"><i class="fas fa-arrow-up"></i></button>
+
+<!-- Core JS -->
+<script src="assets/js/main.js"></script>
+
+<!-- Page-specific JS -->
+<?php foreach ($extraJS as $js): ?>
+<script src="<?= htmlspecialchars($js) ?>"></script>
+<?php endforeach; ?>
+
+</body>
+</html>

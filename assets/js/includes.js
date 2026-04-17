@@ -41,8 +41,8 @@
       <ul>
         <li><a href="index.html"         data-nav="home">Home</a></li>
         <li><a href="shop.html"          data-nav="shop">Collections</a></li>
-        <li><a href="index.html#about"   data-nav="about">About Us</a></li>
-        <li><a href="contact.html" data-nav="contact">Contact</a></li>
+        <li><a href="index.html#about"    data-nav="about">About Us</a></li>
+        <li><a href="contact.html"        data-nav="contact">Contact</a></li>
       </ul>
     </nav>
 
@@ -90,8 +90,8 @@
     <ul>
       <li><a href="index.html"         data-nav="home">Home</a></li>
       <li><a href="shop.html"          data-nav="shop">Collections</a></li>
-      <li><a href="index.html#about"   data-nav="about">About Us</a></li>
-      <li><a href="index.html#contact" data-nav="contact">Contact</a></li>
+      <li><a href="index.html#about"  data-nav="about">About Us</a></li>
+      <li><a href="contact.html"     data-nav="contact">Contact</a></li>
     </ul>
   </nav>
 </header>
@@ -127,7 +127,7 @@
         <ul class="footer__links">
           <li><a href="index.html"><i class="fas fa-chevron-right"></i> Home</a></li>
           <li><a href="shop.html"><i class="fas fa-chevron-right"></i> Collections</a></li>
-          <li><a href="about.html"><i class="fas fa-chevron-right"></i> About Us</a></li>
+          <li><a href="index.html#about"><i class="fas fa-chevron-right"></i> About Us</a></li>
           <li><a href="contact.html"><i class="fas fa-chevron-right"></i> Contact</a></li>
           <li><a href="refund-policy.html"><i class="fas fa-chevron-right"></i> Refund &amp; Returns</a></li>
           <li><a href="cart.html"><i class="fas fa-chevron-right"></i> Shopping Cart</a></li>
@@ -153,7 +153,7 @@
         </div>
         <div class="footer__contact-item">
           <i class="fas fa-phone"></i>
-          <span><a href="tel:+94771234567">+94 77 123 4567</a></span>
+          <span><a href="tel:+94718456999">+94 71 845 6999</a></span>
         </div>
         <div class="footer__contact-item">
           <i class="fas fa-envelope"></i>
@@ -161,7 +161,7 @@
         </div>
         <div class="footer__contact-item">
           <i class="fab fa-whatsapp"></i>
-          <span><a href="#">Chat on WhatsApp</a></span>
+          <span><a href="https://wa.me/94718456999" target="_blank">Chat on WhatsApp</a></span>
         </div>
       </div>
 
@@ -194,7 +194,7 @@
       <p class="cookie-banner__text">
         We use cookies to enhance your browsing experience, personalise content, and analyse our traffic.
         By clicking <strong>"Accept All"</strong> you consent to our use of cookies.
-        Read our <a href="cookies-policy.html">Cookies Policy</a> for more information.
+        Read our <a href="privacy-policy.html">Privacy Policy</a> for more information.
       </p>
     </div>
     <div class="cookie-banner__actions">
@@ -307,6 +307,7 @@
     setActiveNav();
     setHeaderClass();
     setFooterYear();
+    initSmoothScroll();
 
     /* Signal main.js that the DOM is fully ready */
     document.dispatchEvent(new CustomEvent('mc:ready'));
@@ -358,6 +359,56 @@
   function setFooterYear() {
     var el = document.querySelector('.footer__year');
     if (el) el.textContent = new Date().getFullYear();
+  }
+
+
+  /* Smooth-scroll any link that points to a hash target on the current page.
+     Handles both "#section" and "index.html#section" style hrefs.        */
+  function initSmoothScroll() {
+    var isHome = isHomePage();
+
+    document.addEventListener('click', function (e) {
+      var link = e.target.closest('a[href]');
+      if (!link) return;
+
+      var href = link.getAttribute('href');
+      if (!href) return;
+
+      /* Match bare "#id" or "index.html#id" */
+      var bare  = href.match(/^#(.+)$/);
+      var index = href.match(/^index\.html#(.+)$/);
+      var id    = bare ? bare[1] : (index && isHome ? index[1] : null);
+
+      if (!id) return;
+
+      var target = document.getElementById(id);
+      if (!target) return;
+
+      e.preventDefault();
+
+      /* Account for sticky header height */
+      var header = document.querySelector('.site-header');
+      var offset = header ? header.getBoundingClientRect().height : 0;
+      var top    = target.getBoundingClientRect().top + window.pageYOffset - offset - 8;
+
+      window.scrollTo({ top: top, behavior: 'smooth' });
+
+      /* Close mobile nav if open */
+      var mobileNav = document.getElementById('mobileNav');
+      if (mobileNav) mobileNav.classList.remove('open');
+      var hamburger = document.getElementById('hamburger');
+      if (hamburger) hamburger.setAttribute('aria-expanded', 'false');
+    });
+  }
+
+
+  /* True when the current page is the home page (index.html or root) */
+  function isHomePage() {
+    var path = window.location.pathname;
+    return path === '/' ||
+           path === '/index.html' ||
+           path.endsWith('/index.html') ||
+           path.endsWith('/');
   }
 
 })();

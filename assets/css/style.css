@@ -1189,10 +1189,21 @@ html {
 
 
 /* 14. Testimonials  */
-.testimonials__grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+/* Testimonials Slider */
+.testimonials__slider {
+  position: relative;
+  overflow: hidden;
+  margin-top: 48px;
+  padding: 0 56px;
+}
+.testimonials__track {
+  display: flex;
+  transition: transform 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform;
+}
+.testimonials__track .testimonial-card {
+  flex: 0 0 calc(33.333% - 16px);
+  margin-right: 24px;
 }
 
 .testimonial-card {
@@ -1243,6 +1254,58 @@ html {
 .reviewer__avatar img { width: 100%; height: 100%; object-fit: cover; }
 .reviewer__name { font-weight: 700; font-size: 13px; color: var(--text); }
 .reviewer__location { font-size: 11px; color: var(--text-lighter); margin-top: 2px; }
+
+/* Slider arrows */
+.testimonials__arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--white);
+  color: var(--text-mid);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+}
+.testimonials__arrow:hover {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--white);
+  box-shadow: 0 4px 20px rgba(201,168,76,0.35);
+}
+.testimonials__arrow--prev { left: 0; }
+.testimonials__arrow--next { right: 0; }
+
+/* Dots */
+.testimonials__dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 32px;
+}
+.testimonials__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  background: var(--border);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.3s, transform 0.3s, width 0.3s;
+}
+.testimonials__dot.active {
+  background: var(--gold);
+  width: 24px;
+  border-radius: 4px;
+}
 
 
 /* 15. Newsletter */
@@ -1543,7 +1606,8 @@ html {
   .collection-card__img { height: 300px; }
 
   .products__grid     { grid-template-columns: 1fr; }
-  .testimonials__grid { grid-template-columns: 1fr; }
+  .testimonials__slider { padding: 0 44px; }
+  .testimonials__track .testimonial-card { flex: 0 0 100%; margin-right: 24px; }
   .footer__grid       { grid-template-columns: 1fr; gap: 28px; }
   .footer__bottom     { flex-direction: column; gap: 8px; text-align: center; }
   .footer__legal      { justify-content: center; }
