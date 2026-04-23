@@ -1,48 +1,61 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Complete your order securely — Mirabella Ceylon Gems & Jewellery. Fast worldwide shipping on certified gemstones." />
-  <title>Checkout | Mirabella Ceylon</title>
+<?php
+require_once __DIR__ . '/admin/includes/db.php';
+require_once __DIR__ . '/includes/cart.php';
+require_once __DIR__ . '/includes/customer_auth.php';
+require_once __DIR__ . '/includes/site_settings.php';
 
-  <link rel="icon" type="image/png" href="assets/images/favicon.png" />
+$pay = [
+    'bank_name'         => get_site_setting('bank_name',         'Bank of Ceylon'),
+    'bank_branch'       => get_site_setting('bank_branch',       'Colombo 03'),
+    'bank_account_name' => get_site_setting('bank_account_name', 'Mirabella Ceylon (Pvt) Ltd'),
+    'bank_account_no'   => get_site_setting('bank_account_no',   '0072 1234 5678'),
+    'bank_swift'        => get_site_setting('bank_swift',        'BCEYLKLX'),
+    'frimi_number'      => get_site_setting('frimi_number',      '077 123 4567'),
+    'frimi_name'        => get_site_setting('frimi_name',        'Mirabella Ceylon (Pvt) Ltd'),
+    'ezcash_number'     => get_site_setting('ezcash_number',     '071 123 4567'),
+    'ezcash_name'       => get_site_setting('ezcash_name',       'Mirabella Ceylon (Pvt) Ltd'),
+    'whatsapp_number'   => get_site_setting('whatsapp_number',   '+94771234567'),
+];
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Lato:wght@300;400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet" />
+$items    = cart_items();
+$subtotal = cart_subtotal($items);
 
-  <!-- Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+// Redirect to cart if empty
+if (empty($items)) {
+    header('Location: cart.php');
+    exit;
+}
 
-  <!-- Styles -->
-  <link rel="stylesheet" href="assets/css/style.css" />
-  <link rel="stylesheet" href="assets/css/checkout.css" />
-</head>
-<body class="page-loading" data-page="cart" data-header="solid">
+// Pre-fill from session
+$prefill = [
+    'first_name' => $_SESSION['customer_fname'] ?? '',
+    'last_name'  => $_SESSION['customer_lname'] ?? '',
+    'email'      => $_SESSION['customer_email'] ?? '',
+    'phone'      => '',
+];
+// Load phone if logged in
+if (customer_logged_in()) {
+    $st = db()->prepare('SELECT phone FROM customers WHERE id = ?');
+    $st->execute([$_SESSION['customer_id']]);
+    $prefill['phone'] = $st->fetchColumn() ?: '';
+}
 
-<!-- PAGE LOADER -->
-<div class="page-loader" id="pageLoader">
-  <div class="loader-logo">
-    <img src="assets/images/logo.png" alt="Mirabella Ceylon" />
-  </div>
-  <div class="loader-bar"><div class="loader-bar__fill"></div></div>
-</div>
+$pageTitle   = 'Checkout | Mirabella Ceylon';
+$pageDesc    = 'Complete your order securely — Mirabella Ceylon Gems & Jewellery.';
+$headerClass = 'is-solid';
+$extraCSS    = ['assets/css/checkout.css'];
+include 'includes/header.php';
+?>
 
-<!-- SHARED HEADER -->
-<div id="mc-header"></div>
-
-
-<!--  BREADCRUMB BAR -->
+<!-- BREADCRUMB -->
 <div class="checkout-breadcrumb-bar">
   <div class="container">
     <nav class="breadcrumb" aria-label="Breadcrumb">
-      <a href="index.html"><i class="fas fa-home"></i> Home</a>
+      <a href="index.php"><i class="fas fa-home"></i> Home</a>
       <span class="breadcrumb__sep"><i class="fas fa-chevron-right"></i></span>
-      <a href="shop.html">Collections</a>
+      <a href="shop.php">Collections</a>
       <span class="breadcrumb__sep"><i class="fas fa-chevron-right"></i></span>
-      <a href="cart.html">Shopping Cart</a>
+      <a href="cart.php">Shopping Cart</a>
       <span class="breadcrumb__sep"><i class="fas fa-chevron-right"></i></span>
       <span>Checkout</span>
     </nav>
@@ -72,7 +85,6 @@
       </div>
     </div>
 
-    <!-- Layout: Form + Sidebar -->
     <div class="checkout-layout">
 
       <!-- LEFT: Form Panels -->
@@ -81,26 +93,25 @@
         <!-- 1. Contact Information -->
         <div class="checkout-card" id="cardContact">
           <div class="checkout-card__head">
-            <div class="checkout-card__title">
-              <i class="fas fa-user"></i>
-              Contact Information
-            </div>
+            <div class="checkout-card__title"><i class="fas fa-user"></i> Contact Information</div>
           </div>
           <div class="checkout-card__body">
-            <form class="co-form" id="contactForm" novalidate>
+            <div class="co-form">
               <div class="co-row">
                 <div class="co-field">
                   <label for="co-firstName">First Name</label>
                   <div class="co-field__wrap">
                     <i class="fas fa-user co-field__icon"></i>
-                    <input type="text" id="co-firstName" placeholder="John" autocomplete="given-name" required />
+                    <input type="text" id="co-firstName" placeholder="John" autocomplete="given-name"
+                           value="<?= htmlspecialchars($prefill['first_name']) ?>" required />
                   </div>
                 </div>
                 <div class="co-field">
                   <label for="co-lastName">Last Name</label>
                   <div class="co-field__wrap">
                     <i class="fas fa-user co-field__icon"></i>
-                    <input type="text" id="co-lastName" placeholder="Smith" autocomplete="family-name" required />
+                    <input type="text" id="co-lastName" placeholder="Smith" autocomplete="family-name"
+                           value="<?= htmlspecialchars($prefill['last_name']) ?>" required />
                   </div>
                 </div>
               </div>
@@ -109,31 +120,30 @@
                   <label for="co-email">Email Address</label>
                   <div class="co-field__wrap">
                     <i class="fas fa-envelope co-field__icon"></i>
-                    <input type="email" id="co-email" placeholder="you@example.com" autocomplete="email" required />
+                    <input type="email" id="co-email" placeholder="you@example.com" autocomplete="email"
+                           value="<?= htmlspecialchars($prefill['email']) ?>" required />
                   </div>
                 </div>
                 <div class="co-field">
                   <label for="co-phone">Phone Number</label>
                   <div class="co-field__wrap">
                     <i class="fas fa-phone co-field__icon"></i>
-                    <input type="tel" id="co-phone" placeholder="+94 77 123 4567" autocomplete="tel" />
+                    <input type="tel" id="co-phone" placeholder="+94 77 123 4567" autocomplete="tel"
+                           value="<?= htmlspecialchars($prefill['phone']) ?>" />
                   </div>
                 </div>
               </div>
-            </form>
+            </div>
           </div>
         </div>
 
         <!-- 2. Shipping Address -->
         <div class="checkout-card" id="cardShippingAddr">
           <div class="checkout-card__head">
-            <div class="checkout-card__title">
-              <i class="fas fa-map-marker-alt"></i>
-              Shipping Address
-            </div>
+            <div class="checkout-card__title"><i class="fas fa-map-marker-alt"></i> Shipping Address</div>
           </div>
           <div class="checkout-card__body">
-            <form class="co-form" id="addressForm" novalidate>
+            <div class="co-form">
               <div class="co-field">
                 <label for="co-address1">Street Address</label>
                 <div class="co-field__wrap">
@@ -150,7 +160,7 @@
               </div>
               <div class="co-row">
                 <div class="co-field">
-                  <label for="co-city" id="labelCity">City / Town</label>
+                  <label for="co-city">City / Town</label>
                   <div class="co-field__wrap">
                     <i class="fas fa-city co-field__icon"></i>
                     <input type="text" id="co-city" placeholder="Colombo" autocomplete="address-level2" required />
@@ -164,62 +174,38 @@
                       <option value="" disabled>Select country</option>
                       <option value="LK" selected>Sri Lanka</option>
                       <optgroup label="────────────────">
-                      <option value="US">United States</option>
-                      <option value="GB">United Kingdom</option>
-                      <option value="AU">Australia</option>
-                      <option value="CA">Canada</option>
-                      <option value="DE">Germany</option>
-                      <option value="FR">France</option>
-                      <option value="JP">Japan</option>
-                      <option value="SG">Singapore</option>
-                      <option value="AE">United Arab Emirates</option>
-                      <option value="IN">India</option>
-                      <option value="other">Other</option>
+                        <option value="US">United States</option>
+                        <option value="GB">United Kingdom</option>
+                        <option value="AU">Australia</option>
+                        <option value="CA">Canada</option>
+                        <option value="DE">Germany</option>
+                        <option value="FR">France</option>
+                        <option value="JP">Japan</option>
+                        <option value="SG">Singapore</option>
+                        <option value="AE">United Arab Emirates</option>
+                        <option value="IN">India</option>
+                        <option value="other">Other</option>
                       </optgroup>
                     </select>
                   </div>
                 </div>
               </div>
 
-              <!-- District — shown only for Sri Lanka -->
               <div class="co-field" id="fieldDistrict">
                 <label for="co-district">District</label>
                 <div class="co-field__wrap">
                   <i class="fas fa-map-marker-alt co-field__icon"></i>
                   <select id="co-district">
                     <option value="" disabled selected>Select district</option>
-                    <option>Colombo</option>
-                    <option>Gampaha</option>
-                    <option>Kalutara</option>
-                    <option>Kandy</option>
-                    <option>Matale</option>
-                    <option>Nuwara Eliya</option>
-                    <option>Galle</option>
-                    <option>Matara</option>
-                    <option>Hambantota</option>
-                    <option>Jaffna</option>
-                    <option>Kilinochchi</option>
-                    <option>Mannar</option>
-                    <option>Vavuniya</option>
-                    <option>Mullaitivu</option>
-                    <option>Batticaloa</option>
-                    <option>Ampara</option>
-                    <option>Trincomalee</option>
-                    <option>Kurunegala</option>
-                    <option>Puttalam</option>
-                    <option>Anuradhapura</option>
-                    <option>Polonnaruwa</option>
-                    <option>Badulla</option>
-                    <option>Moneragala</option>
-                    <option>Ratnapura</option>
-                    <option>Kegalle</option>
+                    <?php foreach(['Colombo','Gampaha','Kalutara','Kandy','Matale','Nuwara Eliya','Galle','Matara','Hambantota','Jaffna','Kilinochchi','Mannar','Vavuniya','Mullaitivu','Batticaloa','Ampara','Trincomalee','Kurunegala','Puttalam','Anuradhapura','Polonnaruwa','Badulla','Moneragala','Ratnapura','Kegalle'] as $d): ?>
+                    <option><?= $d ?></option>
+                    <?php endforeach; ?>
                   </select>
                 </div>
               </div>
 
-              <!-- State — shown for international -->
               <div class="co-field" id="fieldState" style="display:none;">
-                <label for="co-state" id="labelState">State / Province</label>
+                <label for="co-state">State / Province</label>
                 <div class="co-field__wrap">
                   <i class="fas fa-map co-field__icon"></i>
                   <input type="text" id="co-state" placeholder="e.g. New York" autocomplete="address-level1" />
@@ -227,28 +213,24 @@
               </div>
 
               <div class="co-field">
-                <label for="co-zip" id="labelZip">Postal Code <span id="zipOptional" style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label>
+                <label for="co-zip">Postal Code <span id="zipOptional" style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label>
                 <div class="co-field__wrap">
                   <i class="fas fa-envelope-open-text co-field__icon"></i>
                   <input type="text" id="co-zip" placeholder="e.g. 10001" autocomplete="postal-code" />
                 </div>
               </div>
-            </form>
+            </div>
           </div>
         </div>
 
         <!-- 3. Shipping Method -->
         <div class="checkout-card" id="cardShippingMethod">
           <div class="checkout-card__head">
-            <div class="checkout-card__title">
-              <i class="fas fa-shipping-fast"></i>
-              Shipping Method
-            </div>
+            <div class="checkout-card__title"><i class="fas fa-shipping-fast"></i> Shipping Method</div>
           </div>
           <div class="checkout-card__body">
             <div class="shipping-options" id="shippingOptions">
 
-              <!-- Local (Sri Lanka) options — shown by default -->
               <label class="shipping-option selected" data-zone="local">
                 <input type="radio" name="shipping" value="local-island" checked />
                 <div class="shipping-option__radio"></div>
@@ -282,7 +264,6 @@
                 <div class="shipping-option__price free">Free</div>
               </label>
 
-              <!-- International options — hidden by default -->
               <label class="shipping-option" data-zone="intl" style="display:none;">
                 <input type="radio" name="shipping" value="intl-standard" />
                 <div class="shipping-option__radio"></div>
@@ -323,25 +304,19 @@
         <!-- 4. Payment -->
         <div class="checkout-card" id="cardPayment">
           <div class="checkout-card__head">
-            <div class="checkout-card__title">
-              <i class="fas fa-credit-card"></i>
-              Payment
-            </div>
+            <div class="checkout-card__title"><i class="fas fa-credit-card"></i> Payment</div>
           </div>
           <div class="checkout-card__body">
 
-            <!-- Method tabs -->
             <div class="payment-methods" id="paymentMethods">
               <button class="payment-method active" data-method="bank" type="button" data-zone="local">
                 <i class="fas fa-university"></i> Bank Transfer
               </button>
               <button class="payment-method" data-method="friMi" type="button" data-zone="local">
-                <img src="assets/images/frimi-logo.png" alt="FriMi" class="pm-logo" onerror="this.outerHTML='<i class=\'fas fa-mobile-alt\'></i>'" />
-                FriMi
+                <i class="fas fa-mobile-alt"></i> FriMi
               </button>
               <button class="payment-method" data-method="ezCash" type="button" data-zone="local">
-                <img src="assets/images/ezcash-logo.png" alt="eZ Cash" class="pm-logo" onerror="this.outerHTML='<i class=\'fas fa-mobile-alt\'></i>'" />
-                eZ Cash
+                <i class="fas fa-mobile-alt"></i> eZ Cash
               </button>
               <button class="payment-method" data-method="card" type="button" data-zone="intl" style="display:none;">
                 <i class="fab fa-cc-visa"></i> Credit Card
@@ -351,127 +326,79 @@
               </button>
             </div>
 
-            <!-- Bank Transfer details -->
             <div class="pay-panel" id="panelBank">
               <div class="bank-details">
-                <div class="bank-details__header">
-                  <i class="fas fa-university"></i>
-                  <span>Bank Transfer Details</span>
-                </div>
+                <div class="bank-details__header"><i class="fas fa-university"></i><span>Bank Transfer Details</span></div>
                 <div class="bank-details__rows">
-                  <div class="bank-details__row">
-                    <span>Bank</span>
-                    <strong>Bank of Ceylon</strong>
-                  </div>
-                  <div class="bank-details__row">
-                    <span>Branch</span>
-                    <strong>Colombo 03</strong>
-                  </div>
-                  <div class="bank-details__row">
-                    <span>Account Name</span>
-                    <strong>Mirabella Ceylon (Pvt) Ltd</strong>
-                  </div>
-                  <div class="bank-details__row">
-                    <span>Account No.</span>
-                    <strong class="bank-details__acc">0072 1234 5678</strong>
-                  </div>
-                  <div class="bank-details__row">
-                    <span>SWIFT Code</span>
-                    <strong>BCEYLKLX</strong>
-                  </div>
+                  <?php if ($pay['bank_name']): ?><div class="bank-details__row"><span>Bank</span><strong><?= htmlspecialchars($pay['bank_name']) ?></strong></div><?php endif; ?>
+                  <?php if ($pay['bank_branch']): ?><div class="bank-details__row"><span>Branch</span><strong><?= htmlspecialchars($pay['bank_branch']) ?></strong></div><?php endif; ?>
+                  <?php if ($pay['bank_account_name']): ?><div class="bank-details__row"><span>Account Name</span><strong><?= htmlspecialchars($pay['bank_account_name']) ?></strong></div><?php endif; ?>
+                  <?php if ($pay['bank_account_no']): ?><div class="bank-details__row"><span>Account No.</span><strong class="bank-details__acc"><?= htmlspecialchars($pay['bank_account_no']) ?></strong></div><?php endif; ?>
+                  <?php if ($pay['bank_swift']): ?><div class="bank-details__row"><span>SWIFT Code</span><strong><?= htmlspecialchars($pay['bank_swift']) ?></strong></div><?php endif; ?>
                 </div>
                 <div class="bank-details__note">
                   <i class="fab fa-whatsapp" style="color:#25d366;"></i>
-                  After transferring, please send the payment slip via WhatsApp. Your order will be dispatched once payment is confirmed.
+                  <?php
+                  $waNote = 'After transferring, please send the payment slip via WhatsApp';
+                  if ($pay['whatsapp_number']) $waNote .= ' (' . htmlspecialchars($pay['whatsapp_number']) . ')';
+                  $waNote .= '. Your order will be dispatched once payment is confirmed.';
+                  echo $waNote;
+                  ?>
                 </div>
               </div>
             </div>
 
-            <!-- FriMi -->
             <div class="pay-panel" id="panelFriMi" style="display:none;">
               <div class="mobile-pay-panel">
-                <div class="mobile-pay-panel__icon" style="background:#5b2d8e;">
-                  <i class="fas fa-mobile-alt"></i>
-                </div>
+                <div class="mobile-pay-panel__icon" style="background:#5b2d8e;"><i class="fas fa-mobile-alt"></i></div>
                 <div class="mobile-pay-panel__info">
                   <div class="mobile-pay-panel__label">Send payment to FriMi number</div>
-                  <div class="mobile-pay-panel__number">077 123 4567</div>
-                  <div class="mobile-pay-panel__name">Mirabella Ceylon (Pvt) Ltd</div>
+                  <div class="mobile-pay-panel__number"><?= htmlspecialchars($pay['frimi_number']) ?></div>
+                  <div class="mobile-pay-panel__name"><?= htmlspecialchars($pay['frimi_name']) ?></div>
                 </div>
               </div>
-              <div class="bank-details__note" style="margin-top:12px;">
-                <i class="fab fa-whatsapp" style="color:#25d366;"></i>
-                Send the payment screenshot via WhatsApp after completing your transfer.
-              </div>
+              <div class="bank-details__note" style="margin-top:12px;"><i class="fab fa-whatsapp" style="color:#25d366;"></i> <?php $waSuffix = $pay['whatsapp_number'] ? ' (' . htmlspecialchars($pay['whatsapp_number']) . ')' : ''; echo 'Send the payment screenshot via WhatsApp' . $waSuffix . ' after completing your transfer.'; ?></div>
             </div>
 
-            <!-- eZ Cash -->
             <div class="pay-panel" id="panelEzCash" style="display:none;">
               <div class="mobile-pay-panel">
-                <div class="mobile-pay-panel__icon" style="background:#e31e24;">
-                  <i class="fas fa-mobile-alt"></i>
-                </div>
+                <div class="mobile-pay-panel__icon" style="background:#e31e24;"><i class="fas fa-mobile-alt"></i></div>
                 <div class="mobile-pay-panel__info">
                   <div class="mobile-pay-panel__label">Send payment to eZ Cash number</div>
-                  <div class="mobile-pay-panel__number">071 123 4567</div>
-                  <div class="mobile-pay-panel__name">Mirabella Ceylon (Pvt) Ltd</div>
+                  <div class="mobile-pay-panel__number"><?= htmlspecialchars($pay['ezcash_number']) ?></div>
+                  <div class="mobile-pay-panel__name"><?= htmlspecialchars($pay['ezcash_name']) ?></div>
                 </div>
               </div>
-              <div class="bank-details__note" style="margin-top:12px;">
-                <i class="fab fa-whatsapp" style="color:#25d366;"></i>
-                Send the payment screenshot via WhatsApp after completing your transfer.
-              </div>
+              <div class="bank-details__note" style="margin-top:12px;"><i class="fab fa-whatsapp" style="color:#25d366;"></i> <?php $waSuffix = $pay['whatsapp_number'] ? ' (' . htmlspecialchars($pay['whatsapp_number']) . ')' : ''; echo 'Send the payment screenshot via WhatsApp' . $waSuffix . ' after completing your transfer.'; ?></div>
             </div>
 
-            <!-- Card preview -->
             <div class="card-preview" id="cardPreview" style="display:none;">
               <div class="card-preview__chip"></div>
               <div class="card-preview__number" id="previewNumber">•••• &nbsp;•••• &nbsp;•••• &nbsp;••••</div>
               <div class="card-preview__bottom">
-                <div>
-                  <div class="card-preview__label">Card Holder</div>
-                  <div class="card-preview__value" id="previewName">FULL NAME</div>
-                </div>
-                <div>
-                  <div class="card-preview__label">Expires</div>
-                  <div class="card-preview__value" id="previewExpiry">MM / YY</div>
-                </div>
-                <div class="card-preview__logo">
-                  <i class="fab fa-cc-visa" id="previewBrand"></i>
-                </div>
+                <div><div class="card-preview__label">Card Holder</div><div class="card-preview__value" id="previewName">FULL NAME</div></div>
+                <div><div class="card-preview__label">Expires</div><div class="card-preview__value" id="previewExpiry">MM / YY</div></div>
+                <div class="card-preview__logo"><i class="fab fa-cc-visa" id="previewBrand"></i></div>
               </div>
             </div>
 
-            <!-- Card fields -->
             <form class="co-form" id="paymentForm" novalidate style="display:none;">
               <div class="co-field">
                 <label for="co-cardName">Name on Card</label>
-                <div class="co-field__wrap">
-                  <i class="fas fa-user co-field__icon"></i>
-                  <input type="text" id="co-cardName" placeholder="John Smith" autocomplete="cc-name" />
-                </div>
+                <div class="co-field__wrap"><i class="fas fa-user co-field__icon"></i><input type="text" id="co-cardName" placeholder="John Smith" autocomplete="cc-name" /></div>
               </div>
               <div class="co-field">
                 <label for="co-cardNum">Card Number</label>
-                <div class="co-field__wrap">
-                  <i class="fas fa-credit-card co-field__icon"></i>
-                  <input type="text" id="co-cardNum" placeholder="1234 5678 9012 3456" autocomplete="cc-number" maxlength="19" inputmode="numeric" />
-                </div>
+                <div class="co-field__wrap"><i class="fas fa-credit-card co-field__icon"></i><input type="text" id="co-cardNum" placeholder="1234 5678 9012 3456" autocomplete="cc-number" maxlength="19" inputmode="numeric" /></div>
               </div>
               <div class="co-card-row">
                 <div class="co-field">
                   <label for="co-cardExpiry">Expiry Date</label>
-                  <div class="co-field__wrap">
-                    <i class="far fa-calendar co-field__icon"></i>
-                    <input type="text" id="co-cardExpiry" placeholder="MM / YY" autocomplete="cc-exp" maxlength="7" />
-                  </div>
+                  <div class="co-field__wrap"><i class="far fa-calendar co-field__icon"></i><input type="text" id="co-cardExpiry" placeholder="MM / YY" autocomplete="cc-exp" maxlength="7" /></div>
                 </div>
                 <div class="co-field">
                   <label for="co-cardCvc">CVC / CVV</label>
-                  <div class="co-field__wrap">
-                    <i class="fas fa-lock co-field__icon"></i>
-                    <input type="text" id="co-cardCvc" placeholder="•••" maxlength="4" inputmode="numeric" autocomplete="cc-csc" />
-                  </div>
+                  <div class="co-field__wrap"><i class="fas fa-lock co-field__icon"></i><input type="text" id="co-cardCvc" placeholder="•••" maxlength="4" inputmode="numeric" autocomplete="cc-csc" /></div>
                 </div>
                 <div class="co-field">
                   <label>&nbsp;</label>
@@ -484,43 +411,35 @@
               </div>
             </form>
 
-            <!-- PayPal panel -->
             <div class="pay-panel" id="panelPaypal" style="display:none;">
               <div class="mobile-pay-panel">
-                <div class="mobile-pay-panel__icon" style="background:#003087;">
-                  <i class="fab fa-paypal" style="font-size:20px;"></i>
-                </div>
+                <div class="mobile-pay-panel__icon" style="background:#003087;"><i class="fab fa-paypal" style="font-size:20px;"></i></div>
                 <div class="mobile-pay-panel__info">
                   <div class="mobile-pay-panel__label">Send PayPal payment to</div>
                   <div class="mobile-pay-panel__number">payments@mirabelaceylon.com</div>
                   <div class="mobile-pay-panel__name">Mirabella Ceylon (Pvt) Ltd</div>
                 </div>
               </div>
-              <div class="bank-details__note" style="margin-top:12px;">
-                <i class="fab fa-whatsapp" style="color:#25d366;"></i>
-                Send the PayPal confirmation via WhatsApp once payment is completed.
-              </div>
+              <div class="bank-details__note" style="margin-top:12px;"><i class="fab fa-whatsapp" style="color:#25d366;"></i> Send the PayPal confirmation via WhatsApp once payment is completed.</div>
             </div>
 
-            <!-- WhatsApp footer note -->
             <div class="secure-badge" style="flex-direction:column;align-items:flex-start;gap:6px;margin-top:16px;">
               <div style="display:flex;align-items:center;gap:8px;">
                 <i class="fab fa-whatsapp" style="color:#25d366;font-size:16px;"></i>
                 <strong style="color:var(--text);font-size:12px;">Orders are confirmed via WhatsApp</strong>
               </div>
               <span style="font-size:12px;color:var(--text-soft);line-height:1.5;">
-                After placing your order, WhatsApp will open with your order details pre-filled.
-                Our team will confirm and arrange payment before dispatch.
+                After placing your order, WhatsApp will open with your order details pre-filled. Our team will confirm and arrange payment before dispatch.
               </span>
             </div>
 
           </div>
         </div>
 
-      </div><!-- /.checkout-form-wrap -->
+      </div>
 
 
-      <!-- RIGHT: Order Summary Sidebar -->
+      <!-- RIGHT: Order Summary -->
       <aside class="checkout-summary">
         <div class="checkout-summary__head">
           <span class="checkout-summary__title">Order Summary</span>
@@ -531,58 +450,46 @@
         </div>
 
         <div class="checkout-summary__items">
-
+          <?php foreach ($items as $item): ?>
           <div class="co-item">
             <div class="co-item__img">
-              <img src="assets/images/prod-1.jpg" alt="Blue Sapphire" />
-              <span class="co-item__qty-badge">1</span>
+              <?php if ($item['image_main']): ?>
+              <img src="<?= htmlspecialchars($item['image_main']) ?>" alt="<?= htmlspecialchars($item['name']) ?>" />
+              <?php else: ?>
+              <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f8f6f0;color:#ccc;font-size:18px;"><i class="fas fa-gem"></i></div>
+              <?php endif; ?>
+              <span class="co-item__qty-badge"><?= $item['quantity'] ?></span>
             </div>
-            <span class="co-item__name">Ceylon Blue Sapphire<br /><small style="font-weight:400;color:var(--text-soft);">3.42 ct · Oval · Unheated</small></span>
-            <span class="co-item__price" data-usd="2850">$2,850</span>
+            <span class="co-item__name">
+              <?= htmlspecialchars($item['name']) ?>
+              <?php if ($item['weight_ct'] || $item['cut']): ?>
+              <br /><small style="font-weight:400;color:var(--text-soft);">
+                <?= $item['weight_ct'] ? $item['weight_ct'] . ' ct' : '' ?>
+                <?= $item['cut'] ? ' · ' . htmlspecialchars($item['cut']) : '' ?>
+              </small>
+              <?php endif; ?>
+            </span>
+            <span class="co-item__price" data-usd="<?= $item['price_usd'] * $item['quantity'] ?>">
+              $<?= number_format($item['price_usd'] * $item['quantity'], 0) ?>
+            </span>
           </div>
-
-          <div class="co-item">
-            <div class="co-item__img">
-              <img src="assets/images/prod-2.jpg" alt="Alexandrite" />
-              <span class="co-item__qty-badge">1</span>
-            </div>
-            <span class="co-item__name">Natural Alexandrite<br /><small style="font-weight:400;color:var(--text-soft);">1.18 ct · Round · Colour-change</small></span>
-            <span class="co-item__price" data-usd="4200">$4,200</span>
-          </div>
-
-          <div class="co-item">
-            <div class="co-item__img">
-              <img src="assets/images/prod-3.jpg" alt="Padparadscha" />
-              <span class="co-item__qty-badge">2</span>
-            </div>
-            <span class="co-item__name">Padparadscha Sapphire<br /><small style="font-weight:400;color:var(--text-soft);">0.95 ct · Cushion · Pink-orange</small></span>
-            <span class="co-item__price" data-usd="3600">$3,600</span>
-          </div>
-
+          <?php endforeach; ?>
         </div>
 
         <div class="checkout-summary__totals">
           <div class="co-total-row">
             <span>Subtotal</span>
-            <span data-usd="10650">$10,650</span>
+            <span data-usd="<?= $subtotal ?>">$<?= number_format($subtotal, 0) ?></span>
           </div>
           <div class="co-total-row">
             <span>Shipping</span>
             <span class="co-total-free" id="summaryShipping">Free</span>
           </div>
-          <div class="co-total-row">
-            <span>Discount (MIRABELLA10)</span>
-            <span style="color:var(--gold-dark);" data-usd-neg="1065">−$1,065</span>
-          </div>
-          <div class="co-total-row">
-            <span>VAT (18%)</span>
-            <span data-usd="957">$957</span>
-          </div>
         </div>
 
         <div class="checkout-summary__grand">
           <span>Total</span>
-          <span data-usd="10542">$10,542</span>
+          <span data-usd="<?= $subtotal ?>">$<?= number_format($subtotal, 0) ?></span>
         </div>
         <div class="lkr-rate-note" id="lkrRateNote" style="display:none;">
           <i class="fas fa-info-circle"></i> 1 USD ≈ Rs. 320 &nbsp;·&nbsp; indicative rate only
@@ -600,18 +507,11 @@
         </div>
       </aside>
 
-    </div><!-- /.checkout-layout -->
-
-  </div><!-- /.container -->
+    </div>
+  </div>
 </section>
 
-
-<!-- SHARED FOOTER -->
-<div id="mc-footer"></div>
-
-<!-- Scripts -->
-<script src="assets/js/includes.js"></script>
-<script src="assets/js/main.js"></script>
-<script src="assets/js/checkout.js"></script>
-</body>
-</html>
+<?php
+$extraJS = ['assets/js/checkout.js'];
+include 'includes/footer.php';
+?>

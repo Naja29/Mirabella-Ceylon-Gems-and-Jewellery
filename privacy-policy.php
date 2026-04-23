@@ -1,34 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Privacy Policy — Mirabella Ceylon Gems & Jewellery. Learn how we collect, use, and protect your personal information." />
-  <title>Privacy Policy | Mirabella Ceylon</title>
-  <link rel="icon" type="image/png" href="assets/images/favicon.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Lato:wght@300;400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <link rel="stylesheet" href="assets/css/style.css" />
-  <link rel="stylesheet" href="assets/css/policy.css" />
-</head>
-<body class="page-loading" data-page="privacy" data-header="solid">
+<?php
+require_once __DIR__ . '/includes/site_settings.php';
+$pageTitle   = 'Privacy Policy | Mirabella Ceylon';
+$pageDesc    = 'Privacy Policy — Mirabella Ceylon Gems & Jewellery. Learn how we collect, use, and protect your personal information.';
+$activePage  = '';
+$headerClass = 'is-solid';
+$extraCSS    = ['assets/css/policy.css'];
+include 'includes/header.php';
+?>
 
-<div class="page-loader" id="pageLoader">
-  <div class="loader-logo"><img src="assets/images/logo.png" alt="Mirabella Ceylon" /></div>
-  <div class="loader-bar"><div class="loader-bar__fill"></div></div>
-</div>
-
-<div id="mc-header"></div>
-
-
-<!-- HERO -->
 <div class="policy-hero">
   <div class="container policy-hero__inner">
     <div>
       <nav class="breadcrumb" aria-label="Breadcrumb">
-        <a href="index.html"><i class="fas fa-home"></i> Home</a>
+        <a href="index.php"><i class="fas fa-home"></i> Home</a>
         <span class="breadcrumb__sep"><i class="fas fa-chevron-right"></i></span>
         <span>Privacy Policy</span>
       </nav>
@@ -40,12 +24,9 @@
   </div>
 </div>
 
-
-<!-- BODY -->
 <div class="policy-body">
   <div class="container policy-layout">
 
-    <!-- TOC -->
     <nav class="policy-toc" aria-label="Table of contents">
       <div class="policy-toc__title">Contents</div>
       <div class="policy-toc__list">
@@ -62,7 +43,6 @@
       </div>
     </nav>
 
-    <!-- Content -->
     <div class="policy-content">
 
       <div class="policy-section" id="pp-intro">
@@ -127,7 +107,7 @@
         <div class="policy-section__num">Section 05</div>
         <h2 class="policy-section__title">Cookies</h2>
         <p>We use cookies and similar tracking technologies to enhance your experience. You can manage your cookie preferences at any time using our Cookie Consent banner.</p>
-        <p>You can manage your cookie preferences at any time using the Cookie Consent banner at the bottom of any page. For questions about specific cookies we use, please <a href="contact.html" style="color:var(--gold-dark);font-weight:600;">contact us</a>.</p>
+        <p>For questions about specific cookies we use, please <a href="contact.php" style="color:var(--gold-dark);font-weight:600;">contact us</a>.</p>
       </div>
 
       <div class="policy-section" id="pp-retention">
@@ -180,8 +160,12 @@
           <p><strong>Mirabella Ceylon — Gems &amp; Jewellery Worldwide</strong></p>
           <p>Ratnapura, Sri Lanka (Gem Capital of the World)</p>
           <p>Email: <a href="mailto:privacy@mirabelaceylon.com">privacy@mirabelaceylon.com</a></p>
-          <p>Phone: <a href="tel:+94718456999">+94 71 845 6999</a></p>
-          <p>WhatsApp: <a href="https://wa.me/94718456999">Chat with us</a></p>
+          <?php
+            $ppWa  = preg_replace('/[^0-9]/', '', get_site_setting('whatsapp_number', '94718456999'));
+            $ppTel = get_site_setting('whatsapp_number', '+94 71 845 6999');
+          ?>
+          <p>Phone: <a href="tel:+<?= htmlspecialchars($ppWa) ?>"><?= htmlspecialchars($ppTel) ?></a></p>
+          <p>WhatsApp: <a href="https://wa.me/<?= htmlspecialchars($ppWa) ?>">Chat with us</a></p>
         </div>
         <p style="margin-top:18px;">We aim to respond to all privacy-related enquiries within 30 days.</p>
       </div>
@@ -190,9 +174,4 @@
   </div>
 </div>
 
-
-<div id="mc-footer"></div>
-<script src="assets/js/includes.js"></script>
-<script src="assets/js/main.js"></script>
-</body>
-</html>
+<?php include 'includes/footer.php'; ?>

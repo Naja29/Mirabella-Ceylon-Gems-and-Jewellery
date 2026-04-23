@@ -6,6 +6,18 @@ $adminEmail = $_SESSION['admin_email'] ?? '';
 $initials   = strtoupper(substr($adminName, 0, 1));
 $pageTitle  = $pageTitle  ?? 'Dashboard';
 $activePage = $activePage ?? 'dashboard';
+
+// Notification counts
+try {
+    $_ndb = db();
+    $_pendingOrders  = (int)$_ndb->query("SELECT COUNT(*) FROM orders   WHERE status      = 'pending'")->fetchColumn();
+    $_unreadMessages = (int)$_ndb->query("SELECT COUNT(*) FROM messages WHERE is_read     = 0")->fetchColumn();
+    $_pendingReviews = (int)$_ndb->query("SELECT COUNT(*) FROM reviews  WHERE is_approved = 0")->fetchColumn();
+    $_newCustomers   = (int)$_ndb->query("SELECT COUNT(*) FROM customers WHERE DATE(created_at) = CURDATE()")->fetchColumn();
+} catch (Throwable $_e) {
+    $_pendingOrders = $_unreadMessages = $_pendingReviews = $_newCustomers = 0;
+}
+$_totalNotifs = $_pendingOrders + $_unreadMessages + $_pendingReviews;
 ?>
 
 <!-- SIDEBAR -->
@@ -46,10 +58,17 @@ $activePage = $activePage ?? 'dashboard';
       <span class="sidebar-item__label">Products</span>
     </a>
 
+    <a href="categories.php" data-label="Categories"
+       class="sidebar-item <?= $activePage === 'categories' ? 'active' : '' ?>">
+      <div class="sidebar-item__icon"><i class="fas fa-layer-group"></i></div>
+      <span class="sidebar-item__label">Categories</span>
+    </a>
+
     <a href="customers.php" data-label="Customers"
        class="sidebar-item <?= $activePage === 'customers' ? 'active' : '' ?>">
       <div class="sidebar-item__icon"><i class="fas fa-users"></i></div>
       <span class="sidebar-item__label">Customers</span>
+      <span class="sidebar-badge" id="sbCustomerBadge" style="display:none;"></span>
     </a>
 
     <div class="sidebar-section">Content</div>
@@ -65,6 +84,7 @@ $activePage = $activePage ?? 'dashboard';
        class="sidebar-item <?= $activePage === 'reviews' ? 'active' : '' ?>">
       <div class="sidebar-item__icon"><i class="fas fa-star"></i></div>
       <span class="sidebar-item__label">Reviews</span>
+      <span class="sidebar-badge" id="sbReviewBadge" style="display:none;"></span>
     </a>
 
     <div class="sidebar-section">System</div>
@@ -75,7 +95,7 @@ $activePage = $activePage ?? 'dashboard';
       <span class="sidebar-item__label">Settings</span>
     </a>
 
-    <a href="../index.html" target="_blank" data-label="View Store"
+    <a href="../index.php" target="_blank" data-label="View Store"
        class="sidebar-item">
       <div class="sidebar-item__icon"><i class="fas fa-external-link-alt"></i></div>
       <span class="sidebar-item__label">View Store</span>
@@ -117,14 +137,69 @@ $activePage = $activePage ?? 'dashboard';
 
   <div class="topbar-actions">
 
-    <a href="../index.html" target="_blank" class="topbar-btn" title="View Store">
+    <a href="../index.php" target="_blank" class="topbar-btn" title="View Store">
       <i class="fas fa-store"></i>
     </a>
 
-    <button class="topbar-btn" title="Notifications">
-      <i class="fas fa-bell"></i>
-      <span class="topbar-btn__badge"></span>
-    </button>
+    <div class="notif-wrap" id="notifWrap">
+      <button class="topbar-btn" id="notifBtn" title="Notifications">
+        <i class="fas fa-bell"></i>
+        <span class="topbar-btn__badge notif-count-dot" id="notifBellCount"
+              style="<?= $_totalNotifs > 0 ? '' : 'display:none;' ?>"><?= $_totalNotifs > 9 ? '9+' : $_totalNotifs ?></span>
+      </button>
+
+      <div class="notif-dropdown" id="notifDropdown">
+        <div class="notif-dropdown__head">
+          <span class="notif-dropdown__title">Notifications</span>
+          <?php if ($_totalNotifs > 0): ?>
+          <span class="notif-dropdown__count"><?= $_totalNotifs ?> new</span>
+          <?php endif; ?>
+        </div>
+
+        <?php if ($_totalNotifs === 0): ?>
+        <div class="notif-empty">
+          <i class="fas fa-check-circle"></i>
+          <span>All caught up!</span>
+        </div>
+        <?php else: ?>
+
+        <?php if ($_pendingOrders > 0): ?>
+        <a href="orders.php?status=pending" class="notif-item notif-item--warning">
+          <div class="notif-item__icon"><i class="fas fa-box-open"></i></div>
+          <div class="notif-item__body">
+            <div class="notif-item__text"><strong><?= $_pendingOrders ?></strong> pending order<?= $_pendingOrders > 1 ? 's' : '' ?> awaiting confirmation</div>
+            <div class="notif-item__sub">Tap to review</div>
+          </div>
+        </a>
+        <?php endif; ?>
+
+        <?php if ($_unreadMessages > 0): ?>
+        <a href="messages.php" class="notif-item notif-item--info">
+          <div class="notif-item__icon"><i class="fas fa-envelope"></i></div>
+          <div class="notif-item__body">
+            <div class="notif-item__text"><strong><?= $_unreadMessages ?></strong> unread message<?= $_unreadMessages > 1 ? 's' : '' ?></div>
+            <div class="notif-item__sub">Tap to read</div>
+          </div>
+        </a>
+        <?php endif; ?>
+
+        <?php if ($_pendingReviews > 0): ?>
+        <a href="reviews.php" class="notif-item notif-item--gold">
+          <div class="notif-item__icon"><i class="fas fa-star"></i></div>
+          <div class="notif-item__body">
+            <div class="notif-item__text"><strong><?= $_pendingReviews ?></strong> review<?= $_pendingReviews > 1 ? 's' : '' ?> awaiting approval</div>
+            <div class="notif-item__sub">Tap to approve</div>
+          </div>
+        </a>
+        <?php endif; ?>
+
+        <?php endif; ?>
+
+        <div class="notif-dropdown__foot">
+          <a href="dashboard.php">Go to Dashboard</a>
+        </div>
+      </div>
+    </div>
 
     <div class="topbar-divider"></div>
 
@@ -153,3 +228,4 @@ $activePage = $activePage ?? 'dashboard';
 
   </div>
 </header>
+

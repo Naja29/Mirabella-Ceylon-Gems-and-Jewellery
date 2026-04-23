@@ -14,6 +14,7 @@ if (!empty($_SESSION['admin_logged_in']) && !empty($_SESSION['admin_id'])) {
 $error   = '';
 $notice  = '';
 $email   = '';
+$login   = '';
 
 /* Session / timeout notices */
 if (isset($_GET['reason'])) {
@@ -23,26 +24,24 @@ if (isset($_GET['reason'])) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    $email    = trim($_POST['email']    ?? '');
+    $login    = trim($_POST['email']    ?? '');
+    $email    = $login;
     $password = trim($_POST['password'] ?? '');
     $remember = !empty($_POST['remember']);
 
     /* Basic validation */
-    if (empty($email) || empty($password)) {
-        $error = 'Please enter your email and password.';
-
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error = 'Please enter a valid email address.';
+    if (empty($login) || empty($password)) {
+        $error = 'Please enter your username/email and password.';
 
     } else {
         try {
             $stmt = db()->prepare(
                 'SELECT id, name, email, password_hash, role
                  FROM admin_users
-                 WHERE email = :email AND is_active = 1
+                 WHERE (email = :login OR name = :login2) AND is_active = 1
                  LIMIT 1'
             );
-            $stmt->execute([':email' => $email]);
+            $stmt->execute([':login' => $login, ':login2' => $login]);
             $user = $stmt->fetch();
 
             if ($user && password_verify($password, $user['password_hash'])) {
@@ -178,21 +177,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(bin2hex(random_bytes(16))) ?>" />
 
         <!-- Email -->
-        <div class="lf-field <?= ($error && !empty($_POST['email'])) ? '' : '' ?>" id="fieldEmail">
-          <label for="lfEmail">Email Address</label>
+        <div class="lf-field" id="fieldEmail">
+          <label for="lfEmail">Username or Email</label>
           <div class="lf-field__wrap">
-            <i class="fas fa-envelope lf-field__icon"></i>
+            <i class="fas fa-user lf-field__icon"></i>
             <input
-              type="email"
+              type="text"
               id="lfEmail"
               name="email"
-              value="<?= htmlspecialchars($email) ?>"
-              placeholder="admin@mirabelaceylon.com"
-              autocomplete="email"
+              value="<?= htmlspecialchars($login) ?>"
+              placeholder="admin or admin@example.com"
+              autocomplete="username"
               required
             />
           </div>
-          <div class="lf-field__error-msg" id="emailErr">Please enter a valid email address.</div>
+          <div class="lf-field__error-msg" id="emailErr">Please enter your username or email.</div>
         </div>
 
         <!-- Password -->
@@ -238,7 +237,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p>
           <i class="fas fa-shield-alt" style="color:var(--gold);margin-right:5px;font-size:11px;"></i>
           Restricted to authorised personnel only.<br />
-          <a href="../index.html">← Back to Mirabella Ceylon</a>
+          <a href="../index.php">← Back to Mirabella Ceylon</a>
         </p>
       </div>
 
@@ -279,8 +278,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   form.addEventListener('submit', function () {
     let ok = true;
-    const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value.trim());
-    if (!emailValid) { setError('fieldEmail', 'emailErr', true); ok = false; }
+    if (!emailEl.value.trim()) { setError('fieldEmail', 'emailErr', true); ok = false; }
     if (!passEl.value) { setError('fieldPassword', 'passErr', true); ok = false; }
 
     if (ok) {

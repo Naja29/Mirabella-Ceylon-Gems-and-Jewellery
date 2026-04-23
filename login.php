@@ -1,3 +1,54 @@
+<?php
+require_once __DIR__ . '/admin/includes/db.php';
+require_once __DIR__ . '/includes/customer_auth.php';
+
+// Already logged in — go to account
+if (customer_logged_in()) {
+    header('Location: account.php');
+    exit;
+}
+
+$error  = '';
+$email  = '';
+$next   = htmlspecialchars(trim($_GET['next'] ?? 'account.php'));
+
+// Process login 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email    = trim($_POST['email']    ?? '');
+    $password = trim($_POST['password'] ?? '');
+    $remember = isset($_POST['remember']);
+
+    if (!$email || !$password) {
+        $error = 'Please enter your email and password.';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = 'Please enter a valid email address.';
+    } else {
+        $db = db();
+        $st = $db->prepare('SELECT * FROM customers WHERE email = ? AND is_active = 1 LIMIT 1');
+        $st->execute([$email]);
+        $customer = $st->fetch();
+
+        if (!$customer || !password_verify($password, $customer['password_hash'])) {
+            $error = 'Invalid email or password. Please try again.';
+        } else {
+            // Update last login
+            $db->prepare('UPDATE customers SET last_login = NOW() WHERE id = ?')->execute([$customer['id']]);
+
+            set_customer_session($customer);
+
+            // Remember me — 30 day cookie
+            if ($remember) {
+                $token = bin2hex(random_bytes(32));
+                setcookie('mc_remember', $token, time() + 60 * 60 * 24 * 30, '/', '', false, true);
+            }
+
+            $redirect = (strpos($next, '/') === 0 || strpos($next, 'http') === 0) ? 'account.php' : $next;
+            header('Location: ' . $redirect);
+            exit;
+        }
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,6 +63,11 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link rel="stylesheet" href="assets/css/style.css" />
   <link rel="stylesheet" href="assets/css/auth.css" />
+  <style>
+    .auth-error{display:flex;align-items:center;gap:10px;background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.3);border-radius:8px;padding:12px 16px;font-size:13px;color:#e74c3c;margin-bottom:20px;}
+    .auth-error i{flex-shrink:0;}
+    .auth-success{display:flex;align-items:center;gap:10px;background:rgba(46,204,113,.1);border:1px solid rgba(46,204,113,.3);border-radius:8px;padding:12px 16px;font-size:13px;color:#2ecc71;margin-bottom:20px;}
+  </style>
 </head>
 <body>
 
@@ -24,9 +80,8 @@
       <div class="auth-brand__slide" style="background-image: url('assets/images/hero-2.jpg');"></div>
       <div class="auth-brand__slide" style="background-image: url('assets/images/hero-3.jpg');"></div>
     </div>
-
     <div class="auth-brand__top">
-      <a href="index.html" class="auth-brand__logo">
+      <a href="index.php" class="auth-brand__logo">
         <img src="assets/images/logo.png" alt="Mirabella Ceylon" />
         <div class="auth-brand__logo-text">
           <span class="auth-brand__logo-name">Mirabella Ceylon</span>
@@ -36,47 +91,35 @@
       <h1 class="auth-brand__headline">Welcome<br />back to a world of<br /><em>rare beauty.</em></h1>
       <p class="auth-brand__sub">Sign in to access your wishlist, track your orders, and discover new arrivals from the Gem Capital of the World.</p>
     </div>
-
     <div class="auth-brand__middle">
       <div class="auth-brand__divider"></div>
       <div class="auth-brand__trust">
         <div class="auth-brand__trust-item">
           <div class="auth-brand__trust-icon"><i class="fas fa-certificate"></i></div>
-          <div class="auth-brand__trust-text">
-            <strong>GIA Certified Gemstones</strong>
-            <span>Every stone independently verified</span>
-          </div>
+          <div class="auth-brand__trust-text"><strong>GIA Certified Gemstones</strong><span>Every stone independently verified</span></div>
         </div>
         <div class="auth-brand__trust-item">
           <div class="auth-brand__trust-icon"><i class="fas fa-globe"></i></div>
-          <div class="auth-brand__trust-text">
-            <strong>Worldwide Delivery</strong>
-            <span>Free express shipping over $500</span>
-          </div>
+          <div class="auth-brand__trust-text"><strong>Worldwide Delivery</strong><span>Free express shipping over $500</span></div>
         </div>
         <div class="auth-brand__trust-item">
           <div class="auth-brand__trust-icon"><i class="fas fa-undo-alt"></i></div>
-          <div class="auth-brand__trust-text">
-            <strong>14-Day Returns</strong>
-            <span>No questions asked</span>
-          </div>
+          <div class="auth-brand__trust-text"><strong>14-Day Returns</strong><span>No questions asked</span></div>
         </div>
       </div>
     </div>
-
     <div class="auth-brand__bottom">
-      &copy; <span id="brandYear"></span> Mirabella Ceylon &nbsp;·&nbsp;
-      <a href="privacy-policy.html">Privacy</a> &nbsp;·&nbsp;
-      <a href="terms.html">Terms</a>
+      &copy; <?= date('Y') ?> Mirabella Ceylon &nbsp;·&nbsp;
+      <a href="privacy-policy.php">Privacy</a> &nbsp;·&nbsp;
+      <a href="terms.php">Terms</a>
     </div>
   </div>
 
-  <!-- RIGHT: Form Panel  -->
+  <!-- RIGHT: Form Panel -->
   <div class="auth-form-panel">
     <div class="auth-form-panel__inner">
 
-      <!-- Mobile logo -->
-      <a href="index.html" class="auth-mobile-logo">
+      <a href="index.php" class="auth-mobile-logo">
         <img src="assets/images/logo.png" alt="Mirabella Ceylon" />
         <span>Mirabella Ceylon</span>
       </a>
@@ -85,17 +128,33 @@
       <h2 class="auth-title">Sign in to your account</h2>
       <p class="auth-subtitle">
         Don't have an account?
-        <a href="register.html">Create one free</a>
+        <a href="register.php">Create one free</a>
       </p>
 
-      <!-- Social login -->
+      <!-- Error message -->
+      <?php if ($error): ?>
+      <div class="auth-error">
+        <i class="fas fa-exclamation-circle"></i>
+        <?= htmlspecialchars($error) ?>
+      </div>
+      <?php endif; ?>
+
+      <!-- Success from registration -->
+      <?php if (!empty($_GET['registered'])): ?>
+      <div class="auth-success">
+        <i class="fas fa-check-circle"></i>
+        Account created successfully! Please sign in.
+      </div>
+      <?php endif; ?>
+
+      <!-- Social login (UI only) -->
       <div class="auth-social">
         <button class="auth-social-btn" type="button">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/><path d="M3.964 10.706A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.038l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.962L3.964 7.294C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
           Continue with Google
         </button>
         <button class="auth-social-btn" type="button">
-          <i class="fab fa-facebook fa-facebook"></i>
+          <i class="fab fa-facebook"></i>
           Continue with Facebook
         </button>
       </div>
@@ -103,13 +162,16 @@
       <div class="auth-divider">or sign in with email</div>
 
       <!-- Login form -->
-      <form class="auth-form" id="loginForm" novalidate>
+      <form class="auth-form" id="loginForm" method="POST" novalidate>
+        <input type="hidden" name="next" value="<?= $next ?>">
 
         <div class="auth-field">
           <label for="loginEmail">Email Address</label>
           <div class="auth-field__wrap">
             <i class="fas fa-envelope auth-field__icon"></i>
-            <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email" />
+            <input type="email" id="loginEmail" name="email"
+                   placeholder="you@example.com" autocomplete="email"
+                   value="<?= htmlspecialchars($email) ?>" />
           </div>
         </div>
 
@@ -117,7 +179,8 @@
           <label for="loginPassword">Password</label>
           <div class="auth-field__wrap">
             <i class="fas fa-lock auth-field__icon"></i>
-            <input type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password" />
+            <input type="password" id="loginPassword" name="password"
+                   placeholder="Enter your password" autocomplete="current-password" />
             <button type="button" class="auth-field__toggle" id="toggleLoginPwd" aria-label="Toggle password">
               <i class="far fa-eye"></i>
             </button>
@@ -126,11 +189,11 @@
 
         <div class="auth-form-footer">
           <label class="auth-remember">
-            <input type="checkbox" id="rememberMe" />
+            <input type="checkbox" name="remember" id="rememberMe" />
             <span class="auth-remember__box"></span>
             <span class="auth-remember__label">Remember me</span>
           </label>
-          <a href="#" class="auth-forgot">Forgot password?</a>
+          <a href="forgot-password.php" class="auth-forgot">Forgot password?</a>
         </div>
 
         <button type="submit" class="auth-submit">
@@ -145,8 +208,6 @@
 </div>
 
 <script>
-  document.getElementById('brandYear').textContent = new Date().getFullYear();
-
   // Password visibility toggle
   document.getElementById('toggleLoginPwd')?.addEventListener('click', function () {
     const input = document.getElementById('loginPassword');
@@ -157,17 +218,14 @@
     icon.classList.toggle('fa-eye-slash', isHidden);
   });
 
-  // Form submit (frontend demo — shows toast-style message)
+  // Basic client-side validation before submit
   document.getElementById('loginForm')?.addEventListener('submit', function (e) {
-    e.preventDefault();
     const email = document.getElementById('loginEmail').value.trim();
     const pwd   = document.getElementById('loginPassword').value;
     if (!email || !pwd) {
+      e.preventDefault();
       alert('Please enter your email and password.');
-      return;
     }
-    // Simulate login — redirect to home
-    window.location.href = 'index.html';
   });
 </script>
 </body>

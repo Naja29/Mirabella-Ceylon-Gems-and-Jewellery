@@ -2,7 +2,7 @@
 
 const ContactPage = (() => {
 
-  const WA_NUMBER = '94718456999';
+  const WA_NUMBER = window.MC_WA_NUMBER || '94771234567';
 
 
   /* Collect & validate form values */
@@ -33,15 +33,28 @@ const ContactPage = (() => {
   }
 
 
-  /* Simulate admin POST (replace with real fetch later) */
+  /* Submit to backend */
   function simulateSubmit(data, btn) {
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> &nbsp;Sending…';
 
-    // TODO: replace this timeout with fetch('/api/contact', { method:'POST', body:JSON.stringify(data) })
-    setTimeout(() => {
-      showSuccess();
-    }, 1200);
+    const body = new URLSearchParams(data);
+    fetch('ajax/contact.php', { method: 'POST', body })
+      .then(r => r.json())
+      .then(res => {
+        if (res.ok) {
+          showSuccess();
+        } else {
+          alert(res.error || 'Something went wrong. Please try again.');
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-paper-plane"></i> &nbsp;Send Message';
+        }
+      })
+      .catch(() => {
+        alert('Network error. Please try again.');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-paper-plane"></i> &nbsp;Send Message';
+      });
   }
 
 
@@ -129,6 +142,5 @@ const ContactPage = (() => {
   return { init };
 })();
 
-document.addEventListener('mc:ready', () => {
-  ContactPage.init();
-});
+document.addEventListener('mc:ready',       () => ContactPage.init());
+document.addEventListener('DOMContentLoaded', () => ContactPage.init());

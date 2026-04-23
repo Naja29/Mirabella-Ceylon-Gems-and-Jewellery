@@ -337,6 +337,16 @@
   white-space: nowrap;
   flex-shrink: 0;
 }
+.order-item__view-link {
+  display: block;
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--gold-dark, #a07830);
+  text-decoration: none;
+  text-align: right;
+  white-space: nowrap;
+}
+.order-item__view-link:hover { text-decoration: underline; }
 
 /* Order card footer */
 .order-card__footer {

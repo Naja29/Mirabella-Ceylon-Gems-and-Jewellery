@@ -1,0 +1,58 @@
+Options -Indexes
+
+# Custom error pages
+ErrorDocument 404 /mirabella-ceylon-gems-and-jewellery/404.php
+ErrorDocument 403 /mirabella-ceylon-gems-and-jewellery/404.php
+
+# Enable rewrite engine
+RewriteEngine On
+RewriteBase /mirabella-ceylon-gems-and-jewellery/
+
+# Redirect .html pages to their .php equivalents
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^index\.html$          index.php          [R=301,L]
+RewriteRule ^shop\.html$           shop.php           [R=301,L]
+RewriteRule ^product-detail\.html$ product-detail.php [R=301,L]
+RewriteRule ^cart\.html$           cart.php           [R=301,L]
+RewriteRule ^checkout\.html$       checkout.php       [R=301,L]
+RewriteRule ^login\.html$          login.php          [R=301,L]
+RewriteRule ^register\.html$       register.php       [R=301,L]
+RewriteRule ^wishlist\.html$       wishlist.php       [R=301,L]
+RewriteRule ^contact\.html$        contact.php        [R=301,L]
+RewriteRule ^privacy-policy\.html$ privacy-policy.php [R=301,L]
+RewriteRule ^terms\.html$          terms.php          [R=301,L]
+RewriteRule ^refund-policy\.html$  refund-policy.php  [R=301,L]
+RewriteRule ^orders\.html$         account.php        [R=301,L]
+RewriteRule ^profile\.html$        account.php        [R=301,L]
+RewriteRule ^order-confirmation\.html$ order-confirmation.php [R=301,L]
+RewriteRule ^cookies-policy\.html$    cookies-policy.php    [R=301,L]
+
+# Security headers
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set X-XSS-Protection "1; mode=block"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Protect sensitive files
+<FilesMatch "\.(sql|log|env|json|md|gitignore)$">
+  Order Allow,Deny
+  Deny from all
+</FilesMatch>
+
+# Gzip compression
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/javascript application/javascript application/json
+</IfModule>
+
+# Browser caching
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/jpg    "access plus 1 month"
+  ExpiresByType image/jpeg   "access plus 1 month"
+  ExpiresByType image/png    "access plus 1 month"
+  ExpiresByType image/webp   "access plus 1 month"
+  ExpiresByType text/css     "access plus 1 week"
+  ExpiresByType application/javascript "access plus 1 week"
+</IfModule>

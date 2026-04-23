@@ -3,7 +3,6 @@
 /* Cart State */
 const CartPage = (() => {
 
-  // Build state from DOM on load
   const items = {};
 
   function buildState() {
@@ -34,12 +33,10 @@ const CartPage = (() => {
       count    += item.qty;
     });
 
-    // Apply promo discount if any
-    const discount = parseInt(document.getElementById('cartLayout')?.dataset.discount || '0', 10);
+    const discount   = parseInt(document.getElementById('cartLayout')?.dataset.discount || '0', 10);
     const discounted = Math.round(subtotal * discount / 100);
-    const total = subtotal - discounted;
+    const total      = subtotal - discounted;
 
-    // Update DOM
     const subtotalEl = document.getElementById('subtotalVal');
     const taxEl      = document.getElementById('taxVal');
     const grandEl    = document.getElementById('grandTotalVal');
@@ -59,12 +56,28 @@ const CartPage = (() => {
       discVal.textContent   = '−' + formatPrice(discounted);
     }
 
-    // Show/hide empty state
     const hasItems = Object.keys(items).length > 0;
     const layout   = document.getElementById('cartLayout');
     const empty    = document.getElementById('cartEmpty');
     if (layout) layout.style.display = hasItems ? '' : 'none';
     if (empty)  empty.style.display  = hasItems ? 'none' : '';
+
+    updateHeaderBadge(count);
+  }
+
+  function updateHeaderBadge(count) {
+    document.querySelectorAll('.cart-badge').forEach(el => {
+      el.textContent = count;
+      el.style.display = count > 0 ? '' : 'none';
+    });
+  }
+
+  function syncQty(productId, qty) {
+    const body = new URLSearchParams({ action: 'update', product_id: productId, qty });
+    fetch('ajax/cart.php', { method: 'POST', body })
+      .then(r => r.json())
+      .then(res => { if (res.count !== undefined) updateHeaderBadge(res.count); })
+      .catch(() => {});
   }
 
   function removeItem(id) {
@@ -78,10 +91,16 @@ const CartPage = (() => {
       recalcTotals();
     }, 380);
 
+    const body = new URLSearchParams({ action: 'remove', product_id: id });
+    fetch('ajax/cart.php', { method: 'POST', body }).catch(() => {});
+
     if (typeof Toast !== 'undefined') {
       Toast.show('Item removed from cart', 'fas fa-trash-alt');
     }
   }
+
+  // Debounce map for qty sync
+  const syncTimers = {};
 
   function init() {
     buildState();
@@ -106,6 +125,9 @@ const CartPage = (() => {
       if (qtyEl) qtyEl.textContent = item.qty;
       updateItemPrice(id);
       recalcTotals();
+
+      clearTimeout(syncTimers[id]);
+      syncTimers[id] = setTimeout(() => syncQty(id, item.qty), 600);
     });
 
     // Remove buttons
@@ -115,13 +137,37 @@ const CartPage = (() => {
       removeItem(btn.dataset.remove);
     });
 
-    // Checkout button
-    const checkoutBtn = document.getElementById('checkoutBtn');
-    if (checkoutBtn) {
-      checkoutBtn.addEventListener('click', () => {
-        window.location.href = 'checkout.html';
-      });
-    }
+    // Add to cart from "You may also like"
+    document.addEventListener('click', e => {
+      const btn = e.target.closest('[data-action="add-to-cart"]');
+      if (!btn) return;
+      const productId = btn.dataset.id;
+      if (!productId) return;
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+      const body = new URLSearchParams({ action: 'add', product_id: productId, qty: 1 });
+      fetch('ajax/cart.php', { method: 'POST', body })
+        .then(r => r.json())
+        .then(res => {
+          if (res.ok) {
+            btn.innerHTML = '<i class="fas fa-check"></i> Added';
+            updateHeaderBadge(res.count);
+            if (typeof Toast !== 'undefined') {
+              Toast.show('Item added to cart', 'fas fa-shopping-bag');
+            }
+            setTimeout(() => {
+              btn.disabled = false;
+              btn.innerHTML = '<i class="fas fa-shopping-bag"></i> Add';
+            }, 2000);
+          }
+        })
+        .catch(() => {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-shopping-bag"></i> Add';
+        });
+    });
   }
 
   return { init };
@@ -137,16 +183,16 @@ const PromoCode = (() => {
   };
 
   function init() {
-    const btn   = document.getElementById('applyPromo');
-    const input = document.getElementById('promoCode');
-    const msg   = document.getElementById('promoMsg');
+    const btn    = document.getElementById('applyPromo');
+    const input  = document.getElementById('promoCode');
+    const msg    = document.getElementById('promoMsg');
     const layout = document.getElementById('cartLayout');
     if (!btn || !input) return;
 
     btn.addEventListener('click', () => {
-      const code    = input.value.trim().toUpperCase();
+      const code     = input.value.trim().toUpperCase();
       const discount = CODES[code];
-      msg.className = 'cart-promo__msg';
+      msg.className  = 'cart-promo__msg';
 
       if (!code) {
         msg.textContent = 'Please enter a promo code.';
@@ -161,7 +207,7 @@ const PromoCode = (() => {
         input.disabled = true;
         btn.disabled   = true;
         btn.textContent = 'Applied';
-        CartPage.init && recalcAfterPromo();
+        document.dispatchEvent(new CustomEvent('cart:recalc'));
         if (typeof Toast !== 'undefined') {
           Toast.show(`Promo code applied — ${discount}% off!`, 'fas fa-tag');
         }
@@ -176,23 +222,17 @@ const PromoCode = (() => {
     });
   }
 
-  function recalcAfterPromo() {
-    // Trigger a recalc by dispatching a synthetic click on a qty button (no-op amount)
-    // Simpler: just call CartPage internals — but since they're scoped, fire a custom event
-    document.dispatchEvent(new CustomEvent('cart:recalc'));
-  }
-
   return { init };
 })();
 
 
 /* Boot */
-document.addEventListener('mc:ready', () => {
+function bootCart() {
   CartPage.init();
   PromoCode.init();
-});
+}
 
-// Recalc totals when promo is applied
-document.addEventListener('cart:recalc', () => {
-  CartPage.init();
-});
+document.addEventListener('mc:ready',        bootCart);
+document.addEventListener('DOMContentLoaded', bootCart);
+
+document.addEventListener('cart:recalc', () => CartPage.init());

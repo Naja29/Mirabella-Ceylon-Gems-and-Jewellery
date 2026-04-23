@@ -45,23 +45,25 @@ CREATE TABLE IF NOT EXISTS `categories` (
   `id`          INT UNSIGNED  NOT NULL AUTO_INCREMENT,
   `name`        VARCHAR(100)  NOT NULL,
   `slug`        VARCHAR(110)  NOT NULL UNIQUE,
+  `subtitle`    VARCHAR(120)           DEFAULT NULL,
   `description` TEXT                   DEFAULT NULL,
   `image`       VARCHAR(255)           DEFAULT NULL,
   `sort_order`  SMALLINT      NOT NULL DEFAULT 0,
+  `show_on_home` TINYINT(1)   NOT NULL DEFAULT 0,
   `is_active`   TINYINT(1)    NOT NULL DEFAULT 1,
   `created_at`  DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT IGNORE INTO `categories` (`name`, `slug`, `sort_order`) VALUES
-  ('Blue Sapphire',   'blue-sapphire',   1),
-  ('Ruby',            'ruby',            2),
-  ('Alexandrite',     'alexandrite',     3),
-  ('Cat\'s Eye',      'cats-eye',        4),
-  ('Padparadscha',    'padparadscha',    5),
-  ('Spinel',          'spinel',          6),
-  ('Jewellery',       'jewellery',       7),
-  ('Loose Gemstones', 'loose-gemstones', 8);
+INSERT IGNORE INTO `categories` (`name`, `slug`, `subtitle`, `image`, `sort_order`, `show_on_home`) VALUES
+  ('Blue Sapphire',   'blue-sapphire',   'Ceylon\'s Finest',    'assets/images/cat-sapphires.jpg',    1, 1),
+  ('Ruby',            'ruby',            'Deep &amp; Vibrant',  'assets/images/cat-ruby.jpg',         2, 0),
+  ('Alexandrite',     'alexandrite',     'Colour-Change Magic', 'assets/images/cat-gems.jpg',         3, 0),
+  ('Cat\'s Eye',      'cats-eye',        'Rare &amp; Mystical', 'assets/images/cat-gems.jpg',         4, 0),
+  ('Padparadscha',    'padparadscha',    'Sunset Sapphires',    'assets/images/cat-padparadscha.jpg', 5, 1),
+  ('Spinel',          'spinel',          'Bold &amp; Beautiful','assets/images/cat-gems.jpg',         6, 0),
+  ('Jewellery',       'jewellery',       'Gold &amp; Platinum', 'assets/images/cat-jewellery.jpg',    7, 1),
+  ('Loose Gemstones', 'loose-gemstones', 'Certified &amp; Natural','assets/images/cat-gems.jpg',     8, 1);
 
 
 -- 4. PRODUCTS
@@ -276,4 +278,59 @@ CREATE TABLE IF NOT EXISTS `newsletter_subscribers` (
   `subscribed_at` DATETIME   NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- 14. WISHLISTS
+CREATE TABLE IF NOT EXISTS `wishlists` (
+  `id`          INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `customer_id` INT UNSIGNED NOT NULL,
+  `product_id`  INT UNSIGNED NOT NULL,
+  `added_at`    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_wish` (`customer_id`, `product_id`),
+  CONSTRAINT `fk_wish_customer` FOREIGN KEY (`customer_id`) REFERENCES `customers`(`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_wish_product`  FOREIGN KEY (`product_id`)  REFERENCES `products`(`id`)  ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- 15. SETTINGS  (key-value store for site configuration)
+CREATE TABLE IF NOT EXISTS `settings` (
+  `key`        VARCHAR(100) NOT NULL,
+  `value`      TEXT                  DEFAULT NULL,
+  `updated_at` DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT IGNORE INTO `settings` (`key`, `value`) VALUES
+  ('store_name',         'Mirabella Ceylon'),
+  ('store_email',        'info@mirabelaceylon.com'),
+  ('store_phone',        ''),
+  ('store_address',      ''),
+  ('store_currency',     'USD'),
+  ('social_instagram',   ''),
+  ('social_facebook',    ''),
+  ('social_whatsapp',    ''),
+  ('social_linkedin',    ''),
+  ('social_youtube',     ''),
+  ('social_pinterest',   ''),
+  ('bank_name',          'Bank of Ceylon'),
+  ('bank_branch',        'Colombo 03'),
+  ('bank_account_name',  'Mirabella Ceylon (Pvt) Ltd'),
+  ('bank_account_no',    '0072 1234 5678'),
+  ('bank_swift',         'BCEYLKLX'),
+  ('frimi_number',       '077 123 4567'),
+  ('frimi_name',         'Mirabella Ceylon (Pvt) Ltd'),
+  ('ezcash_number',      '071 123 4567'),
+  ('ezcash_name',        'Mirabella Ceylon (Pvt) Ltd'),
+  ('whatsapp_number',    '+94771234567'),
+  ('maintenance_mode',   '0'),
+  ('maintenance_msg',    'We are currently under maintenance. We will be back shortly. Thank you for your patience.'),
+  ('smtp_driver',        'smtp'),
+  ('smtp_host',          ''),
+  ('smtp_port',          '465'),
+  ('smtp_encryption',    'ssl'),
+  ('smtp_username',      ''),
+  ('smtp_password',      ''),
+  ('smtp_from_name',     'Mirabella Ceylon'),
+  ('smtp_from_email',    '');
 

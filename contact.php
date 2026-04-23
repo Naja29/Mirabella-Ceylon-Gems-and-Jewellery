@@ -1,30 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Contact Mirabella Ceylon — reach our gemstone specialists via WhatsApp, email or visit our Colombo showroom." />
-  <title>Contact Us | Mirabella Ceylon</title>
+<?php
+require_once __DIR__ . '/admin/includes/db.php';
+require_once __DIR__ . '/includes/site_settings.php';
 
-  <link rel="icon" type="image/png" href="assets/images/favicon.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Lato:wght@300;400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <link rel="stylesheet" href="assets/css/style.css" />
-  <link rel="stylesheet" href="assets/css/contact.css" />
-</head>
-<body class="page-loading" data-page="contact" data-header="solid">
+$storeEmail  = get_site_setting('store_email',      'info@mirabelaceylon.com');
+$storePhone  = get_site_setting('store_phone',      '+94 77 123 4567');
+$waNumber    = get_site_setting('whatsapp_number',  '+94771234567');
+$waLink      = 'https://wa.me/' . preg_replace('/[^0-9]/', '', $waNumber);
 
-<!-- PAGE LOADER -->
-<div class="page-loader" id="pageLoader">
-  <div class="loader-logo"><img src="assets/images/logo.png" alt="Mirabella Ceylon" /></div>
-  <div class="loader-bar"><div class="loader-bar__fill"></div></div>
-</div>
+$social = [
+    'facebook'  => ['url' => get_site_setting('social_facebook'),  'icon' => 'fab fa-facebook-f',  'label' => 'Facebook'],
+    'instagram' => ['url' => get_site_setting('social_instagram'), 'icon' => 'fab fa-instagram',   'label' => 'Instagram'],
+    'youtube'   => ['url' => get_site_setting('social_youtube'),   'icon' => 'fab fa-youtube',     'label' => 'YouTube'],
+    'linkedin'  => ['url' => get_site_setting('social_linkedin'),  'icon' => 'fab fa-linkedin-in', 'label' => 'LinkedIn'],
+    'whatsapp'  => ['url' => $waLink,                              'icon' => 'fab fa-whatsapp',    'label' => 'WhatsApp', 'style' => 'color:#25d366;border-color:rgba(37,211,102,0.3);'],
+    'pinterest' => ['url' => get_site_setting('social_pinterest'), 'icon' => 'fab fa-pinterest-p', 'label' => 'Pinterest'],
+];
+$activeSocial = array_filter($social, fn($s) => !empty($s['url']));
 
-<!-- SHARED HEADER -->
-<div id="mc-header"></div>
-
+$pageTitle   = 'Contact Us | Mirabella Ceylon';
+$pageDesc    = 'Contact Mirabella Ceylon — reach our gemstone specialists via WhatsApp, email or visit our Colombo showroom.';
+$activePage  = 'contact';
+$headerClass = 'is-solid';
+$extraCSS    = ['assets/css/contact.css'];
+include 'includes/header.php';
+?>
 
 <!-- HERO -->
 <section class="contact-hero">
@@ -33,9 +32,9 @@
     <h1 class="contact-hero__title">We'd love to hear<br /><em>from you</em></h1>
     <p class="contact-hero__sub">
       Whether you're looking for a specific gemstone, need certification advice,
-      or want to place a custom order — our specialists are ready to help.
+      or want to place a custom order - our specialists are ready to help.
     </p>
-    <a href="https://wa.me/94718456999" target="_blank" class="contact-hero__wa-btn">
+    <a href="<?= htmlspecialchars($waLink) ?>" target="_blank" class="contact-hero__wa-btn">
       <i class="fab fa-whatsapp"></i>
       Chat on WhatsApp — fastest response
     </a>
@@ -43,7 +42,7 @@
 </section>
 
 
-<!-- MAIN SECTION-->
+<!-- MAIN SECTION -->
 <section class="contact-section">
   <div class="container">
     <div class="contact-layout">
@@ -51,13 +50,12 @@
       <!-- LEFT: Form -->
       <div>
 
-        <!-- Contact Form -->
         <div class="contact-form-wrap">
           <div class="contact-form-wrap__head">
             <i class="fas fa-paper-plane"></i>
             <div>
               <div class="contact-form-wrap__title">Send us a Message</div>
-              <div class="contact-form-wrap__sub">We typically reply within 2 – 4 hours during business hours</div>
+              <div class="contact-form-wrap__sub">We typically reply within 2 - 4 hours during business hours</div>
             </div>
           </div>
           <div class="contact-form-wrap__body">
@@ -68,7 +66,7 @@
               <div class="cf-success__title">Message received!</div>
               <p class="cf-success__sub">
                 Thank you for reaching out. Our team will get back to you
-                within 2 – 4 hours during business hours.
+                within 2 - 4 hours during business hours.
               </p>
             </div>
 
@@ -80,14 +78,14 @@
                   <label for="cf-name">Your Name</label>
                   <div class="cf-field__wrap">
                     <i class="fas fa-user cf-field__icon"></i>
-                    <input type="text" id="cf-name" placeholder="Kasun Perera" autocomplete="name" required />
+                    <input type="text" id="cf-name" name="name" placeholder="Kasun Perera" autocomplete="name" required />
                   </div>
                 </div>
                 <div class="cf-field">
                   <label for="cf-email">Email Address</label>
                   <div class="cf-field__wrap">
                     <i class="fas fa-envelope cf-field__icon"></i>
-                    <input type="email" id="cf-email" placeholder="you@example.com" autocomplete="email" required />
+                    <input type="email" id="cf-email" name="email" placeholder="you@example.com" autocomplete="email" required />
                   </div>
                 </div>
               </div>
@@ -97,14 +95,14 @@
                   <label for="cf-phone">Phone / WhatsApp <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label>
                   <div class="cf-field__wrap">
                     <i class="fas fa-phone cf-field__icon"></i>
-                    <input type="tel" id="cf-phone" placeholder="+94 77 123 4567" autocomplete="tel" />
+                    <input type="tel" id="cf-phone" name="phone" placeholder="+94 77 123 4567" autocomplete="tel" />
                   </div>
                 </div>
                 <div class="cf-field">
                   <label for="cf-subject">Subject</label>
                   <div class="cf-field__wrap">
                     <i class="fas fa-tag cf-field__icon"></i>
-                    <select id="cf-subject" required>
+                    <select id="cf-subject" name="subject" required>
                       <option value="" disabled selected>Select a topic</option>
                       <option value="General Inquiry">General Inquiry</option>
                       <option value="Order Support">Order Support</option>
@@ -122,7 +120,7 @@
                 <label for="cf-message">Message</label>
                 <div class="cf-field__wrap" style="align-items:flex-start;">
                   <i class="fas fa-comment-alt cf-field__icon" style="top:13px;position:absolute;"></i>
-                  <textarea id="cf-message" placeholder="Tell us what you're looking for, your budget, preferred gemstone, or any other details…" required></textarea>
+                  <textarea id="cf-message" name="message" placeholder="Tell us what you're looking for, your budget, preferred gemstone, or any other details…" required></textarea>
                 </div>
               </div>
 
@@ -210,15 +208,15 @@
             </div>
           </div>
 
-        </div><!-- /.contact-faq -->
+        </div>
 
-      </div><!-- /.left -->
+      </div>
 
 
       <!-- RIGHT: Info Sidebar -->
       <div class="contact-info">
 
-        <!-- WhatsApp -->
+        <?php if ($waNumber): ?>
         <div class="contact-card">
           <div class="contact-card__inner">
             <div class="contact-card__icon contact-card__icon--green">
@@ -227,14 +225,15 @@
             <div>
               <div class="contact-card__label">WhatsApp (Fastest)</div>
               <div class="contact-card__value">
-                <a href="https://wa.me/94718456999" target="_blank">+94 71 845 6999</a>
+                <a href="<?= htmlspecialchars($waLink) ?>" target="_blank"><?= htmlspecialchars($waNumber) ?></a>
               </div>
               <div class="contact-card__sub">Typically replies within 1 hour<br />Available 7 days a week</div>
             </div>
           </div>
         </div>
+        <?php endif; ?>
 
-        <!-- Email -->
+        <?php if ($storeEmail): ?>
         <div class="contact-card">
           <div class="contact-card__inner">
             <div class="contact-card__icon contact-card__icon--blue">
@@ -243,14 +242,14 @@
             <div>
               <div class="contact-card__label">Email</div>
               <div class="contact-card__value">
-                <a href="mailto:info@mirabelaceylon.com">info@mirabelaceylon.com</a>
+                <a href="mailto:<?= htmlspecialchars($storeEmail) ?>"><?= htmlspecialchars($storeEmail) ?></a>
               </div>
               <div class="contact-card__sub">For detailed inquiries &amp; documentation<br />Response within 24 hours</div>
             </div>
           </div>
         </div>
+        <?php endif; ?>
 
-        <!-- Showroom -->
         <div class="contact-card">
           <div class="contact-card__inner">
             <div class="contact-card__icon contact-card__icon--gold">
@@ -262,7 +261,6 @@
               <div class="contact-card__sub">Near Kollupitiya Junction<br />Appointments recommended</div>
             </div>
           </div>
-          <!-- Map placeholder -->
           <div class="contact-map__frame">
             <i class="fas fa-map-marked-alt"></i>
             <span>42 Galle Road, Colombo 03</span>
@@ -272,7 +270,6 @@
           </div>
         </div>
 
-        <!-- Opening Hours -->
         <div class="contact-card">
           <div class="contact-card__inner">
             <div class="contact-card__icon contact-card__icon--purple">
@@ -290,7 +287,6 @@
           </div>
         </div>
 
-        <!-- Ratnapura Office -->
         <div class="contact-card">
           <div class="contact-card__inner">
             <div class="contact-card__icon contact-card__icon--gold">
@@ -304,7 +300,6 @@
           </div>
         </div>
 
-        <!-- Social -->
         <div class="contact-card">
           <div class="contact-card__inner">
             <div class="contact-card__icon contact-card__icon--gold">
@@ -315,23 +310,17 @@
               <div class="contact-card__sub" style="margin-top:4px;">Stay updated with new arrivals &amp; gem insights</div>
             </div>
           </div>
+          <?php if ($activeSocial): ?>
           <div class="contact-socials">
-            <a href="#" class="contact-social-btn" aria-label="Facebook" title="Facebook">
-              <i class="fab fa-facebook-f"></i>
+            <?php foreach ($activeSocial as $s): ?>
+            <a href="<?= htmlspecialchars($s['url']) ?>" target="_blank" rel="noopener noreferrer"
+               class="contact-social-btn" aria-label="<?= htmlspecialchars($s['label']) ?>"
+               <?= isset($s['style']) ? 'style="' . $s['style'] . '"' : '' ?>>
+              <i class="<?= $s['icon'] ?>"></i>
             </a>
-            <a href="#" class="contact-social-btn" aria-label="Instagram" title="Instagram">
-              <i class="fab fa-instagram"></i>
-            </a>
-            <a href="#" class="contact-social-btn" aria-label="YouTube" title="YouTube">
-              <i class="fab fa-youtube"></i>
-            </a>
-            <a href="#" class="contact-social-btn" aria-label="LinkedIn" title="LinkedIn">
-              <i class="fab fa-linkedin-in"></i>
-            </a>
-            <a href="https://wa.me/94718456999" target="_blank" class="contact-social-btn" aria-label="WhatsApp" title="WhatsApp" style="color:#25d366;border-color:rgba(37,211,102,0.3);">
-              <i class="fab fa-whatsapp"></i>
-            </a>
+            <?php endforeach; ?>
           </div>
+          <?php endif; ?>
         </div>
 
       </div>
@@ -340,13 +329,8 @@
   </div>
 </section>
 
-
-<!-- SHARED FOOTER -->
-<div id="mc-footer"></div>
-
-<!-- Scripts -->
-<script src="assets/js/includes.js"></script>
-<script src="assets/js/main.js"></script>
-<script src="assets/js/contact.js"></script>
-</body>
-</html>
+<script>window.MC_WA_NUMBER = '<?= preg_replace('/[^0-9]/', '', $waNumber) ?>';</script>
+<?php
+$extraJS = ['assets/js/contact.js'];
+include 'includes/footer.php';
+?>

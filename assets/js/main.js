@@ -6,13 +6,21 @@ const Loader = (() => {
     const loader = document.getElementById('pageLoader');
     if (!loader) return;
 
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        loader.classList.add('hidden');
-        document.body.classList.remove('page-loading');
-        document.body.classList.add('page-ready');
-      }, 1900);
-    });
+    let dismissed = false;
+
+    function hide() {
+      if (dismissed) return;
+      dismissed = true;
+      loader.classList.add('hidden');
+      document.body.classList.remove('page-loading');
+      document.body.classList.add('page-ready');
+    }
+
+    // Hide shortly after all resources load
+    window.addEventListener('load', () => setTimeout(hide, 500));
+
+    // Hard fallback — always hide after 3s regardless of resource state
+    setTimeout(hide, 3000);
   }
   return { init };
 })();
@@ -211,44 +219,83 @@ const Sparkle = (() => {
 })();
 
 
-/*  Cart */
+/* Cart — real AJAX, global event delegation */
 const Cart = (() => {
-  let count = parseInt(localStorage.getItem('mc_cart') || '0', 10);
-
-  function updateBadges() {
-    document.querySelectorAll('.cart-badge').forEach(el => { el.textContent = count; });
-  }
-
-  function add() {
-    count++;
-    localStorage.setItem('mc_cart', count);
-    updateBadges();
-    Toast.show('Added to cart', 'fas fa-shopping-bag');
+  function updateBadges(count) {
+    document.querySelectorAll('.cart-badge').forEach(el => {
+      el.textContent   = count;
+      el.style.display = count > 0 ? '' : 'none';
+    });
   }
 
   function init() {
-    updateBadges();
-    document.querySelectorAll('[data-action="add-to-cart"]').forEach(btn => {
-      btn.addEventListener('click', e => { e.stopPropagation(); add(); });
+    // Sync badge on page load
+    fetch('ajax/cart.php', { method: 'POST', body: new URLSearchParams({ action: 'count' }) })
+      .then(r => r.json())
+      .then(res => { if (res.count !== undefined) updateBadges(res.count); })
+      .catch(() => {});
+
+    document.addEventListener('click', e => {
+      const btn = e.target.closest('[data-action="add-to-cart"]');
+      if (!btn) return;
+      const productId = btn.dataset.id;
+      if (!productId) return;
+
+      const orig = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+      const body = new URLSearchParams({ action: 'add', product_id: productId, qty: 1 });
+      fetch('ajax/cart.php', { method: 'POST', body })
+        .then(r => r.json())
+        .then(res => {
+          if (res.ok) {
+            btn.innerHTML = '<i class="fas fa-check"></i> Added';
+            if (res.count !== undefined) updateBadges(res.count);
+            Toast.show('Added to cart', 'fas fa-shopping-bag');
+            setTimeout(() => { btn.disabled = false; btn.innerHTML = orig; }, 2000);
+          } else {
+            btn.disabled = false;
+            btn.innerHTML = orig;
+          }
+        })
+        .catch(() => { btn.disabled = false; btn.innerHTML = orig; });
     });
   }
   return { init };
 })();
 
 
-/* Wishlist */
+/* Wishlist — real AJAX, global event delegation */
 const Wishlist = (() => {
   function init() {
-    document.querySelectorAll('.product-card__wishlist').forEach(btn => {
-      btn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        const active = this.classList.toggle('active');
-        const icon   = this.querySelector('i');
-        icon.classList.toggle('far', !active);
-        icon.classList.toggle('fas',  active);
-        Toast.show(active ? 'Added to wishlist' : 'Removed from wishlist',
-                   active ? 'fas fa-heart' : 'far fa-heart');
-      });
+    document.addEventListener('click', e => {
+      const btn = e.target.closest('.product-card__wishlist, .js-wishlist-btn, .js-pd-wishlist');
+      if (!btn || btn.classList.contains('js-wl-remove')) return;
+      const productId = btn.dataset.id;
+      if (!productId) return;
+
+      if (!window.MC_LOGGED_IN) {
+        Toast.show('Sign in to save to your wishlist', 'fas fa-heart');
+        setTimeout(() => {
+          window.location.href = 'login.php?next=' + encodeURIComponent(window.location.pathname + window.location.search);
+        }, 1200);
+        return;
+      }
+
+      const body = new URLSearchParams({ action: 'toggle', product_id: productId });
+      fetch('ajax/wishlist.php', { method: 'POST', body })
+        .then(r => r.json())
+        .then(res => {
+          if (!res.ok) return;
+          const added = res.action === 'added';
+          const icon  = btn.querySelector('i');
+          if (icon) { icon.classList.toggle('fas', added); icon.classList.toggle('far', !added); }
+          btn.classList.toggle('active', added);
+          btn.style.color = added ? 'var(--gold-dark,#a07830)' : '';
+          Toast.show(added ? 'Saved to wishlist' : 'Removed from wishlist', added ? 'fas fa-heart' : 'far fa-heart');
+        })
+        .catch(() => {});
     });
   }
   return { init };
@@ -264,22 +311,22 @@ const Toast = (() => {
       el = document.createElement('div');
       el.className = 'toast';
       document.body.appendChild(el);
-      el.addEventListener('click', e => {
-        if (e.target.closest('.toast__close')) dismiss();
-      });
     }
     return el;
   }
 
   function dismiss() {
     clearTimeout(timer);
-    el.classList.remove('show');
+    timer = null;
+    if (el) el.classList.remove('show');
   }
 
   function show(msg, icon = 'fas fa-check-circle') {
     const t = getEl();
 
-    // Reset progress bar animation by re-cloning it
+    clearTimeout(timer);
+    timer = null;
+
     t.innerHTML = `
       <i class="toast__icon ${icon}"></i>
       <span class="toast__msg">${msg}</span>
@@ -287,16 +334,18 @@ const Toast = (() => {
       <div class="toast__progress"></div>
     `;
 
-    clearTimeout(timer);
-    // Force reflow so animation restarts cleanly
+    // Wire close button directly — no relying on event delegation after innerHTML rebuild
+    t.querySelector('.toast__close').addEventListener('click', dismiss);
+
+    // Force reflow so CSS transition & progress animation restart cleanly
     t.classList.remove('show');
     void t.offsetWidth;
     t.classList.add('show');
 
-    timer = setTimeout(dismiss, 2800);
+    timer = setTimeout(dismiss, 4000);
   }
 
-  return { show };
+  return { show, dismiss };
 })();
 
 
@@ -351,7 +400,10 @@ const ActiveNav = (() => {
       });
     });
 
-    // Scroll spy using IntersectionObserver
+    // Scroll spy only runs on the home page where the sections exist
+    const isHome = document.body.dataset.page === 'home';
+    if (!isHome) return;
+
     const observers = [];
     SECTIONS.forEach(id => {
       const el = document.getElementById(id);
@@ -413,23 +465,7 @@ const AccountDropdown = (() => {
 
 /* Search Overlay */
 const SearchOverlay = (() => {
-  // Product catalogue — add more entries as products grow
-  const PRODUCTS = [
-    { name: 'Royal Blue Ceylon Sapphire — 4.82ct', cat: 'Blue Sapphires', price: '$12,500', img: 'assets/images/prod-1.jpg', href: 'product-detail.html' },
-    { name: 'Royal Blue Ceylon Sapphire — 3.5ct',  cat: 'Blue Sapphires', price: '$1,850',  img: 'assets/images/prod-1.jpg', href: 'product-detail.html' },
-    { name: 'Cornflower Blue Sapphire — 3.10ct',   cat: 'Blue Sapphires', price: '$9,800',  img: 'assets/images/prod-2.jpg', href: 'product-detail.html' },
-    { name: 'Unheated Ceylon Sapphire — 2.2ct',    cat: 'Blue Sapphires', price: '$2,800',  img: 'assets/images/prod-4.jpg', href: 'product-detail.html' },
-    { name: 'Padparadscha Sapphire — 2.75ct',      cat: 'Padparadscha',   price: '$18,500', img: 'assets/images/prod-3.jpg', href: 'product-detail.html' },
-    { name: 'Padparadscha Sapphire — 2.8ct',       cat: 'Padparadscha',   price: '$5,600',  img: 'assets/images/prod-4.jpg', href: 'product-detail.html' },
-    { name: 'Chrysoberyl Cat\'s Eye — 4.2ct',      cat: 'Cat\'s Eye',     price: '$2,400',  img: 'assets/images/prod-3.jpg', href: 'product-detail.html' },
-    { name: 'Alexandrite Cat\'s Eye — 1.5ct',      cat: 'Cat\'s Eye',     price: '$6,500',  img: 'assets/images/prod-5.jpg', href: 'product-detail.html' },
-    { name: 'Blue Star Sapphire Cabochon — 6ct',   cat: 'Star Sapphires', price: '$3,900',  img: 'assets/images/prod-5.jpg', href: 'product-detail.html' },
-    { name: 'Blue Star Sapphire — 6.50ct',         cat: 'Star Sapphires', price: '$7,200',  img: 'assets/images/prod-4.jpg', href: 'product-detail.html' },
-    { name: 'Natural Ceylon Ruby — 2.1ct',         cat: 'Rubies',         price: '$4,100',  img: 'assets/images/prod-6.jpg', href: 'product-detail.html' },
-    { name: 'Natural Ruby — 2.20ct Pigeon Blood',  cat: 'Rubies',         price: '$14,000', img: 'assets/images/prod-1.jpg', href: 'product-detail.html' },
-    { name: '18K Gold Sapphire Solitaire Ring',    cat: 'Jewellery',      price: '$3,200',  img: 'assets/images/prod-2.jpg', href: 'product-detail.html' },
-    { name: '18K White Gold Diamond Necklace',     cat: 'Jewellery',      price: '$4,800',  img: 'assets/images/prod-6.jpg', href: 'product-detail.html' },
-  ];
+  let debounceTimer = null;
 
   function highlight(text, query) {
     if (!query) return text;
@@ -437,19 +473,13 @@ const SearchOverlay = (() => {
     return text.replace(re, '<mark>$1</mark>');
   }
 
-  function search(query) {
-    if (!query) return [];
-    const q = query.toLowerCase();
-    return PRODUCTS.filter(p =>
-      p.name.toLowerCase().includes(q) || p.cat.toLowerCase().includes(q)
-    );
-  }
-
   function renderResults(results, query) {
     return results.map(p => `
       <a href="${p.href}" class="search-result-item">
         <div class="search-result-item__img">
-          <img src="${p.img}" alt="${p.name}" loading="lazy" />
+          ${p.img
+            ? `<img src="${p.img}" alt="${p.name}" loading="lazy" />`
+            : `<i class="fas fa-gem" style="font-size:22px;color:var(--gold);"></i>`}
         </div>
         <div>
           <div class="search-result-item__cat">${p.cat}</div>
@@ -461,15 +491,15 @@ const SearchOverlay = (() => {
   }
 
   function init() {
-    const openBtn    = document.getElementById('searchBtn');
-    const overlay    = document.getElementById('searchOverlay');
-    const closeBtn   = document.getElementById('searchClose');
-    const backdrop   = document.getElementById('searchBackdrop');
-    const input      = document.getElementById('searchInput');
-    const clearBtn   = document.getElementById('searchClear');
-    const defaultEl  = document.getElementById('searchDefault');
+    const openBtn     = document.getElementById('searchBtn');
+    const overlay     = document.getElementById('searchOverlay');
+    const closeBtn    = document.getElementById('searchClose');
+    const backdrop    = document.getElementById('searchBackdrop');
+    const input       = document.getElementById('searchInput');
+    const clearBtn    = document.getElementById('searchClear');
+    const defaultEl   = document.getElementById('searchDefault');
     const resultsList = document.getElementById('searchResultsList');
-    const noResults  = document.getElementById('searchNoResults');
+    const noResults   = document.getElementById('searchNoResults');
     const noResultsTerm = document.getElementById('searchNoResultsTerm');
     if (!openBtn || !overlay) return;
 
@@ -483,49 +513,61 @@ const SearchOverlay = (() => {
       overlay.classList.remove('open');
       overlay.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
-      if (input) { input.value = ''; onInput(); }
+      if (input) { input.value = ''; showDefault(); }
+    }
+    function showDefault() {
+      if (clearBtn)    clearBtn.style.display    = 'none';
+      if (defaultEl)   defaultEl.style.display   = '';
+      if (resultsList) resultsList.style.display  = 'none';
+      if (noResults)   noResults.style.display    = 'none';
+    }
+    function showLoading() {
+      if (defaultEl)   defaultEl.style.display   = 'none';
+      if (resultsList) resultsList.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-soft);"><i class="fas fa-spinner fa-spin"></i></div>';
+      if (resultsList) resultsList.style.display  = '';
+      if (noResults)   noResults.style.display    = 'none';
     }
 
     function onInput() {
       const q = input ? input.value.trim() : '';
       if (clearBtn) clearBtn.style.display = q ? '' : 'none';
+      if (!q) { showDefault(); return; }
 
-      if (!q) {
-        defaultEl   && (defaultEl.style.display = '');
-        resultsList && (resultsList.style.display = 'none');
-        noResults   && (noResults.style.display = 'none');
-        return;
-      }
+      clearTimeout(debounceTimer);
+      showLoading();
 
-      const results = search(q);
-      defaultEl && (defaultEl.style.display = 'none');
-
-      if (results.length) {
-        resultsList && (resultsList.style.display = '');
-        noResults   && (noResults.style.display = 'none');
-        if (resultsList) resultsList.innerHTML = renderResults(results, q);
-      } else {
-        resultsList && (resultsList.style.display = 'none');
-        noResults   && (noResults.style.display = '');
-        if (noResultsTerm) noResultsTerm.textContent = q;
-      }
+      debounceTimer = setTimeout(() => {
+        fetch('ajax/search.php?q=' + encodeURIComponent(q))
+          .then(r => r.json())
+          .then(res => {
+            if (!res.ok) return;
+            if (defaultEl) defaultEl.style.display = 'none';
+            if (res.results.length) {
+              if (resultsList) { resultsList.style.display = ''; resultsList.innerHTML = renderResults(res.results, q); }
+              if (noResults)   noResults.style.display = 'none';
+            } else {
+              if (resultsList) resultsList.style.display = 'none';
+              if (noResults)   noResults.style.display = '';
+              if (noResultsTerm) noResultsTerm.textContent = q;
+            }
+          })
+          .catch(() => { if (resultsList) resultsList.style.display = 'none'; });
+      }, 280);
     }
 
     openBtn.addEventListener('click', open);
-    closeBtn  && closeBtn.addEventListener('click', close);
-    backdrop  && backdrop.addEventListener('click', close);
-    input     && input.addEventListener('input', onInput);
-    clearBtn  && clearBtn.addEventListener('click', () => {
+    closeBtn && closeBtn.addEventListener('click', close);
+    backdrop && backdrop.addEventListener('click', close);
+    input    && input.addEventListener('input', onInput);
+    clearBtn && clearBtn.addEventListener('click', () => {
       if (input) { input.value = ''; input.focus(); }
-      onInput();
+      showDefault();
     });
 
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape' && overlay.classList.contains('open')) close();
-      // Open search with Ctrl+K or /
-      if ((e.ctrlKey && e.key === 'k') && !overlay.classList.contains('open')) {
-        e.preventDefault();
-        open();
+      if (e.ctrlKey && e.key === 'k' && !overlay.classList.contains('open')) {
+        e.preventDefault(); open();
       }
     });
   }
@@ -535,36 +577,36 @@ const SearchOverlay = (() => {
 
 /* Product Card Links */
 const ProductLinks = (() => {
-  const DETAIL_PAGE = 'product-detail.html';
+  function href(card) {
+    const slug = card.dataset.slug;
+    return slug ? 'product-detail.php?slug=' + encodeURIComponent(slug) : null;
+  }
 
   function init() {
     document.querySelectorAll('.product-card').forEach(card => {
-      // Make the image area a link
+      const url = href(card);
+      if (!url) return;
+
       const img = card.querySelector('.product-card__img');
       if (img) {
         img.style.cursor = 'pointer';
         img.addEventListener('click', e => {
-          // Ignore clicks on wishlist button or overlay button
-          if (e.target.closest('.product-card__wishlist')) return;
-          window.location.href = DETAIL_PAGE;
+          if (e.target.closest('.product-card__wishlist, [data-action="add-to-cart"], .btn-quickview')) return;
+          window.location.href = url;
         });
       }
 
-      // Make the product name a link
       const name = card.querySelector('.product-card__name');
-      if (name) {
+      if (name && !name.querySelector('a')) {
         name.style.cursor = 'pointer';
-        name.addEventListener('click', () => {
-          window.location.href = DETAIL_PAGE;
-        });
+        name.addEventListener('click', () => { window.location.href = url; });
       }
 
-      // Quick View button → product detail
       const qv = card.querySelector('.btn-quickview');
-      if (qv) {
+      if (qv && !qv.getAttribute('href')) {
         qv.addEventListener('click', e => {
           e.stopPropagation();
-          window.location.href = DETAIL_PAGE;
+          window.location.href = url;
         });
       }
     });
@@ -673,18 +715,10 @@ const TestimonialsSlider = (() => {
 
 
 /* Boot */
-
-/* Loader runs immediately — the #pageLoader div is hardcoded in
-   every HTML page so it is always in the DOM on DOMContentLoaded. */
-document.addEventListener('DOMContentLoaded', () => {
-  Loader.init();
-});
-
-/* Everything else waits for includes.js to inject the shared
-   header & footer, then fires the mc:ready custom event.
-   If includes.js is not used on a page the event never fires,
-   so each module's init() safely guards with an early return. */
-document.addEventListener('mc:ready', () => {
+let _booted = false;
+function boot() {
+  if (_booted) return;
+  _booted = true;
   Header.init();
   MobileNav.init();
   HeroSlider.init();
@@ -701,7 +735,10 @@ document.addEventListener('mc:ready', () => {
   AccountDropdown.init();
   SearchOverlay.init();
   TestimonialsSlider.init();
-});
+}
+
+document.addEventListener('DOMContentLoaded', () => { Loader.init(); boot(); });
+document.addEventListener('mc:ready', boot);
 
 
 /* Cookie Consent */

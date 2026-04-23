@@ -1,34 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Terms & Conditions — Mirabella Ceylon Gems & Jewellery. Please read our terms of sale and use before placing an order." />
-  <title>Terms &amp; Conditions | Mirabella Ceylon</title>
-  <link rel="icon" type="image/png" href="assets/images/favicon.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Lato:wght@300;400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <link rel="stylesheet" href="assets/css/style.css" />
-  <link rel="stylesheet" href="assets/css/policy.css" />
-</head>
-<body class="page-loading" data-page="terms" data-header="solid">
+<?php
+require_once __DIR__ . '/includes/site_settings.php';
+$pageTitle   = 'Terms & Conditions | Mirabella Ceylon';
+$pageDesc    = 'Terms & Conditions — Mirabella Ceylon Gems & Jewellery. Please read our terms of sale and use before placing an order.';
+$activePage  = '';
+$headerClass = 'is-solid';
+$extraCSS    = ['assets/css/policy.css'];
+include 'includes/header.php';
+?>
 
-<div class="page-loader" id="pageLoader">
-  <div class="loader-logo"><img src="assets/images/logo.png" alt="Mirabella Ceylon" /></div>
-  <div class="loader-bar"><div class="loader-bar__fill"></div></div>
-</div>
-
-<div id="mc-header"></div>
-
-
-<!--  HERO -->
 <div class="policy-hero">
   <div class="container policy-hero__inner">
     <div>
       <nav class="breadcrumb" aria-label="Breadcrumb">
-        <a href="index.html"><i class="fas fa-home"></i> Home</a>
+        <a href="index.php"><i class="fas fa-home"></i> Home</a>
         <span class="breadcrumb__sep"><i class="fas fa-chevron-right"></i></span>
         <span>Terms &amp; Conditions</span>
       </nav>
@@ -40,12 +24,9 @@
   </div>
 </div>
 
-
-<!-- BODY -->
 <div class="policy-body">
   <div class="container policy-layout">
 
-    <!-- TOC -->
     <nav class="policy-toc" aria-label="Table of contents">
       <div class="policy-toc__title">Contents</div>
       <div class="policy-toc__list">
@@ -62,7 +43,6 @@
       </div>
     </nav>
 
-    <!-- Content -->
     <div class="policy-content">
 
       <div class="policy-section" id="tc-intro">
@@ -131,14 +111,13 @@
           <li>The original packaging and gift box must be included</li>
           <li>Return shipping costs are the buyer's responsibility unless the item is defective or incorrectly described</li>
         </ul>
-        <h4>Refunds</h4>
-        <p>Once we receive and inspect the returned item, we will notify you of the approval or rejection of your refund. Approved refunds will be processed within 5–10 business days to your original payment method.</p>
+        <p>For full details see our <a href="refund-policy.php" style="color:var(--gold-dark);font-weight:600;">Refund &amp; Return Policy</a>.</p>
       </div>
 
       <div class="policy-section" id="tc-cert">
         <div class="policy-section__num">Section 06</div>
         <h2 class="policy-section__title">Certification &amp; Authenticity</h2>
-        <p>All gemstones sold by Mirabella Ceylon are accompanied by certificates from reputable independent gemological laboratories including GIA (Gemological Institute of America), GRS (GemResearch Swisslab), and GGTL.</p>
+        <p>All gemstones sold by Mirabella Ceylon are accompanied by certificates from reputable independent gemological laboratories including GIA, GRS, and GGTL.</p>
         <ul class="policy-list">
           <li>Certificates confirm species, variety, weight, dimensions, colour, clarity, and treatment status</li>
           <li>Mirabella Ceylon does not alter or modify any gemological certificate</li>
@@ -157,13 +136,7 @@
       <div class="policy-section" id="tc-liability">
         <div class="policy-section__num">Section 08</div>
         <h2 class="policy-section__title">Limitation of Liability</h2>
-        <p>To the fullest extent permitted by law, Mirabella Ceylon shall not be liable for any indirect, incidental, special, or consequential damages arising from:</p>
-        <ul class="policy-list">
-          <li>Use or inability to use our website or products</li>
-          <li>Delays in shipping or delivery caused by third parties or circumstances beyond our control</li>
-          <li>Fluctuations in gemstone market values after purchase</li>
-          <li>Loss of data or business interruption</li>
-        </ul>
+        <p>To the fullest extent permitted by law, Mirabella Ceylon shall not be liable for any indirect, incidental, special, or consequential damages arising from use of our website or products.</p>
         <p>Our total liability to you shall not exceed the purchase price of the product giving rise to the claim.</p>
       </div>
 
@@ -171,7 +144,6 @@
         <div class="policy-section__num">Section 09</div>
         <h2 class="policy-section__title">Governing Law</h2>
         <p>These Terms are governed by and construed in accordance with the laws of Sri Lanka. Any disputes arising under or in connection with these Terms shall be subject to the exclusive jurisdiction of the courts of Sri Lanka.</p>
-        <p>If any provision of these Terms is found to be invalid or unenforceable, the remaining provisions shall remain in full force and effect.</p>
       </div>
 
       <div class="policy-section" id="tc-contact">
@@ -182,8 +154,12 @@
           <p><strong>Mirabella Ceylon — Gems &amp; Jewellery Worldwide</strong></p>
           <p>Ratnapura, Sri Lanka (Gem Capital of the World)</p>
           <p>Email: <a href="mailto:info@mirabelaceylon.com">info@mirabelaceylon.com</a></p>
-          <p>Phone: <a href="tel:+94771234567">+94 77 123 4567</a></p>
-          <p>WhatsApp: <a href="#">Chat with us</a></p>
+          <?php
+            $tcWa  = preg_replace('/[^0-9]/', '', get_site_setting('whatsapp_number', '94718456999'));
+            $tcTel = get_site_setting('whatsapp_number', '+94 71 845 6999');
+          ?>
+          <p>Phone: <a href="tel:+<?= htmlspecialchars($tcWa) ?>"><?= htmlspecialchars($tcTel) ?></a></p>
+          <p>WhatsApp: <a href="https://wa.me/<?= htmlspecialchars($tcWa) ?>">Chat with us</a></p>
         </div>
       </div>
 
@@ -191,9 +167,4 @@
   </div>
 </div>
 
-
-<div id="mc-footer"></div>
-<script src="assets/js/includes.js"></script>
-<script src="assets/js/main.js"></script>
-</body>
-</html>
+<?php include 'includes/footer.php'; ?>

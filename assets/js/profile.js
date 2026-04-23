@@ -133,7 +133,7 @@ const ProfilePage = (() => {
   function initSignOut() {
     document.getElementById('signOutBtn')?.addEventListener('click', () => {
       if (confirm('Are you sure you want to sign out?')) {
-        window.location.href = 'login.html';
+        window.location.href = 'login.php';
       }
     });
   }

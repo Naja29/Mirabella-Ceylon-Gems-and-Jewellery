@@ -14,6 +14,17 @@
  */
 
 $extraJS = $extraJS ?? [];
+require_once __DIR__ . '/site_settings.php';
+
+$social = [
+    'facebook'  => ['url' => get_site_setting('social_facebook'),  'icon' => 'fab fa-facebook-f',  'label' => 'Facebook'],
+    'instagram' => ['url' => get_site_setting('social_instagram'), 'icon' => 'fab fa-instagram',   'label' => 'Instagram'],
+    'whatsapp'  => ['url' => get_site_setting('social_whatsapp'),  'icon' => 'fab fa-whatsapp',    'label' => 'WhatsApp'],
+    'linkedin'  => ['url' => get_site_setting('social_linkedin'),  'icon' => 'fab fa-linkedin-in', 'label' => 'LinkedIn'],
+    'youtube'   => ['url' => get_site_setting('social_youtube'),   'icon' => 'fab fa-youtube',     'label' => 'YouTube'],
+    'pinterest' => ['url' => get_site_setting('social_pinterest'), 'icon' => 'fab fa-pinterest-p', 'label' => 'Pinterest'],
+];
+$hasSocial = array_filter($social, fn($s) => !empty($s['url']));
 ?>
 
 <!-- ══════════════════════════════════════════════════════
@@ -32,13 +43,15 @@ $extraJS = $extraJS ?? [];
           </div>
         </div>
         <p class="footer__brand-desc">Bringing the world's finest certified Ceylon gemstones and handcrafted jewellery to collectors and connoisseurs everywhere.</p>
+        <?php if ($hasSocial): ?>
         <div class="footer__social">
-          <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-          <a href="#" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
-          <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
-          <a href="#" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a>
+          <?php foreach ($hasSocial as $s): ?>
+          <a href="<?= htmlspecialchars($s['url']) ?>" aria-label="<?= htmlspecialchars($s['label']) ?>" target="_blank" rel="noopener noreferrer">
+            <i class="<?= $s['icon'] ?>"></i>
+          </a>
+          <?php endforeach; ?>
         </div>
+        <?php endif; ?>
       </div>
 
       <div>
@@ -55,11 +68,11 @@ $extraJS = $extraJS ?? [];
       <div>
         <h4 class="footer__col-title">Gemstones</h4>
         <ul class="footer__links">
-          <li><a href="shop.php?cat=sapphire"><i class="fas fa-chevron-right"></i> Blue Sapphires</a></li>
+          <li><a href="shop.php?cat=blue-sapphire"><i class="fas fa-chevron-right"></i> Blue Sapphires</a></li>
           <li><a href="shop.php?cat=padparadscha"><i class="fas fa-chevron-right"></i> Padparadscha</a></li>
           <li><a href="shop.php?cat=cats-eye"><i class="fas fa-chevron-right"></i> Cat's Eye</a></li>
           <li><a href="shop.php?cat=ruby"><i class="fas fa-chevron-right"></i> Natural Rubies</a></li>
-          <li><a href="shop.php?cat=star-sapphire"><i class="fas fa-chevron-right"></i> Star Sapphires</a></li>
+          <li><a href="shop.php?cat=jewellery"><i class="fas fa-chevron-right"></i> Jewellery</a></li>
         </ul>
       </div>
 
@@ -94,9 +107,9 @@ $extraJS = $extraJS ?? [];
       <div class="footer__legal">
         <a href="privacy-policy.php">Privacy Policy</a>
         <span class="footer__legal-sep">|</span>
-        <a href="cookies-policy.php">Cookies Policy</a>
-        <span class="footer__legal-sep">|</span>
         <a href="terms.php">Terms &amp; Conditions</a>
+        <span class="footer__legal-sep">|</span>
+        <a href="refund-policy.php">Refund &amp; Returns</a>
       </div>
     </div>
   </div>
@@ -181,6 +194,49 @@ $extraJS = $extraJS ?? [];
 </div>
 
 <button id="scrollToTop" aria-label="Back to top"><i class="fas fa-arrow-up"></i></button>
+
+
+<!-- ══════════════════════════════════════════════════════
+     SEARCH OVERLAY
+═══════════════════════════════════════════════════════════ -->
+<div class="search-overlay" id="searchOverlay" role="dialog" aria-label="Search" aria-modal="true" aria-hidden="true">
+  <div class="search-overlay__backdrop" id="searchBackdrop"></div>
+  <div class="search-overlay__box">
+    <div class="search-overlay__header">
+      <div class="search-overlay__input-wrap">
+        <i class="fas fa-search search-overlay__icon"></i>
+        <input type="text" id="searchInput" class="search-overlay__input"
+               placeholder="Search gemstones, jewellery…" autocomplete="off" spellcheck="false" />
+        <button class="search-overlay__clear" id="searchClear" aria-label="Clear search" style="display:none;">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <button class="search-overlay__close" id="searchClose" aria-label="Close search">
+        <i class="fas fa-times"></i><span>ESC</span>
+      </button>
+    </div>
+    <div class="search-overlay__body">
+      <div class="search-default" id="searchDefault">
+        <p class="search-default__label">Browse by category</p>
+        <div class="search-default__tags">
+          <a href="shop.php?cat=blue-sapphire"><i class="fas fa-gem"></i> Blue Sapphires</a>
+          <a href="shop.php?cat=padparadscha"><i class="fas fa-gem"></i> Padparadscha</a>
+          <a href="shop.php?cat=cats-eye"><i class="fas fa-eye"></i> Cat's Eye</a>
+          <a href="shop.php?cat=ruby"><i class="fas fa-gem"></i> Rubies</a>
+          <a href="shop.php?cat=jewellery"><i class="fas fa-ring"></i> Jewellery</a>
+          <a href="shop.php?cat=loose-gemstones"><i class="fas fa-star"></i> Loose Gems</a>
+        </div>
+      </div>
+      <div class="search-results-list" id="searchResultsList" style="display:none;"></div>
+      <div class="search-no-results" id="searchNoResults" style="display:none;">
+        <i class="fas fa-gem"></i>
+        <p>No results for "<span id="searchNoResultsTerm"></span>"</p>
+        <a href="shop.php">Browse all collections <i class="fas fa-arrow-right"></i></a>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <!-- Core JS -->
 <script src="assets/js/main.js"></script>

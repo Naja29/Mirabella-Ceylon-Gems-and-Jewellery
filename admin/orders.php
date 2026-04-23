@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/db.php';
+require_once __DIR__ . '/includes/activity.php';
+require_once __DIR__ . '/../includes/mailer.php';
 
 $pageTitle  = 'Orders';
 $activePage = 'orders';
@@ -31,13 +33,84 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 WHERE id = ?")
                ->execute([$status, $payStatus, $notes, $shippedAt, $deliveredAt, $id]);
 
+            $orderRow = $db->prepare('SELECT * FROM orders WHERE id = ?');
+            $orderRow->execute([$id]);
+            $oRow = $orderRow->fetch();
+            $oNum = $oRow['order_number'] ?? "#$id";
+            log_activity('order', "Order $oNum status updated to '$status' (payment: $payStatus)");
+
+            // Send status update email to customer
+            if ($oRow && !empty($oRow['customer_email'])) {
+                $statusLabels = [
+                    'pending'    => 'Pending',
+                    'confirmed'  => 'Confirmed',
+                    'processing' => 'Processing',
+                    'shipped'    => 'Shipped',
+                    'delivered'  => 'Delivered',
+                    'cancelled'  => 'Cancelled',
+                    'refunded'   => 'Refunded',
+                ];
+                $statusLabel = $statusLabels[$status] ?? ucfirst($status);
+                $statusColors = [
+                    'confirmed'  => '#22a06b',
+                    'processing' => '#c8a84b',
+                    'shipped'    => '#0070f3',
+                    'delivered'  => '#22a06b',
+                    'cancelled'  => '#d04040',
+                    'refunded'   => '#888',
+                    'pending'    => '#888',
+                ];
+                $badgeColor = $statusColors[$status] ?? '#888';
+                $custName   = $oRow['customer_name'] ?? 'Valued Customer';
+                $firstName  = explode(' ', $custName)[0];
+
+                $msgMap = [
+                    'confirmed'  => 'Great news! Your order has been confirmed and we are preparing it for you.',
+                    'processing' => 'Your order is currently being processed and will be dispatched soon.',
+                    'shipped'    => 'Your order is on its way! Expect delivery within the estimated timeframe.',
+                    'delivered'  => 'Your order has been delivered. We hope you love your purchase!',
+                    'cancelled'  => 'Your order has been cancelled. Please contact us if you have any questions.',
+                    'refunded'   => 'Your refund has been processed. Please allow a few business days for it to reflect.',
+                    'pending'    => 'Your order is pending. We will update you once it is confirmed.',
+                ];
+                $statusMsg = $msgMap[$status] ?? 'Your order status has been updated.';
+
+                $statusBody = '
+<p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#444;">
+  Hi <strong>' . htmlspecialchars($firstName) . '</strong>, we have an update on your order.
+</p>
+<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;background:#f9f7f3;border-radius:6px;padding:16px 20px;">
+  <tr>
+    <td style="font-size:13px;color:#888;padding-bottom:4px;">Order Number</td>
+    <td style="font-size:15px;font-weight:700;color:#c8a84b;text-align:right;">' . htmlspecialchars($oNum) . '</td>
+  </tr>
+  <tr>
+    <td style="font-size:13px;color:#888;">New Status</td>
+    <td style="text-align:right;"><span style="display:inline-block;background:' . $badgeColor . ';color:#fff;padding:3px 12px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:.5px;">' . htmlspecialchars($statusLabel) . '</span></td>
+  </tr>
+</table>
+<p style="margin:0 0 24px;font-size:15px;line-height:1.7;color:#444;">' . htmlspecialchars($statusMsg) . '</p>
+' . ($notes ? '<p style="margin:0 0 16px;font-size:14px;color:#555;background:#fff9ee;border-left:3px solid #c8a84b;padding:12px 16px;border-radius:0 4px 4px 0;">
+  <strong>Note from us:</strong> ' . nl2br(htmlspecialchars($notes)) . '
+</p>' : '') . '
+<p style="margin:0;font-size:13px;color:#888;">Thank you for shopping with us. Please reply to this email or contact us via WhatsApp for any queries.</p>';
+
+                send_mail(
+                    $oRow['customer_email'],
+                    $custName,
+                    'Order Update: ' . $oNum . ' — ' . $statusLabel,
+                    mail_wrap('Order Status Update', $statusBody)
+                );
+            }
+
             $flash = 'Order updated successfully.';
         } else {
             $flash = 'Invalid data.'; $flashType = 'error';
         }
 
-        header('Location: orders.php?flash=' . urlencode($flash) . '&ft=' . $flashType
-            . ($id ? '&view=' . $id : ''));
+        // Only re-open the drawer on error so the user can fix the issue
+        $viewParam = ($flashType === 'error' && $id) ? '&view=' . $id : '';
+        header('Location: orders.php?flash=' . urlencode($flash) . '&ft=' . $flashType . $viewParam);
         exit;
     }
 }

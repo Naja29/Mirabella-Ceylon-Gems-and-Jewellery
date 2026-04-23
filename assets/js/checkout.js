@@ -240,6 +240,9 @@ const CheckoutPage = (() => {
       '\uD83D\uDED4 *New Order \u2014 Mirabella Ceylon*',
       '\u2501'.repeat(24),
       '',
+      '*\uD83D\uDCCB Order Reference*',
+      'Order: *' + f.orderNumber + '*',
+      '',
       '*\uD83D\uDC64 Customer*',
       'Name:    ' + f.firstName + ' ' + f.lastName,
       'Email:   ' + f.email,
@@ -280,7 +283,7 @@ const CheckoutPage = (() => {
   }
 
 
-  /* Place order → WhatsApp */
+  /* Place order → save to DB → WhatsApp */
   function initPlaceOrder() {
     const btn = document.getElementById('placeOrderBtn');
     if (!btn) return;
@@ -289,41 +292,72 @@ const CheckoutPage = (() => {
       const firstName = document.getElementById('co-firstName')?.value.trim();
       const lastName  = document.getElementById('co-lastName')?.value.trim();
       const email     = document.getElementById('co-email')?.value.trim();
-      const phone     = document.getElementById('co-phone')?.value.trim();
+      const phone     = document.getElementById('co-phone')?.value.trim() || '';
       const address1  = document.getElementById('co-address1')?.value.trim();
-      const address2  = document.getElementById('co-address2')?.value.trim();
+      const address2  = document.getElementById('co-address2')?.value.trim() || '';
       const city      = document.getElementById('co-city')?.value.trim();
-      const zip       = document.getElementById('co-zip')?.value.trim();
+      const zip       = document.getElementById('co-zip')?.value.trim() || '';
       const countryEl = document.getElementById('co-country');
-      const country   = countryEl?.options[countryEl.selectedIndex]?.text || '';
-      const isSL      = countryEl?.value === 'LK';
+      const country   = countryEl?.value || '';
+      const countryName = countryEl?.options[countryEl.selectedIndex]?.text || country;
+      const isSL      = country === 'LK';
       const district  = isSL ? (document.getElementById('co-district')?.value || '') : '';
       const state     = !isSL ? (document.getElementById('co-state')?.value.trim() || '') : '';
 
       if (!firstName || !lastName)   { alert('Please enter your full name.');            return; }
       if (!email)                    { alert('Please enter your email address.');        return; }
       if (!address1 || !city)        { alert('Please complete your shipping address.'); return; }
-      if (!countryEl?.value)         { alert('Please select your country.');             return; }
+      if (!country)                  { alert('Please select your country.');             return; }
       if (!zip && !isSL)             { alert('Please enter your postal / ZIP code.');   return; }
 
-      const selectedShipping = document.querySelector('.shipping-option.selected .shipping-option__name')?.textContent.trim() || 'Standard';
-      const paymentLabel     = document.querySelector('#paymentMethods .payment-method.active')?.textContent.trim() || 'Not specified';
-      const totalUSD = parseFloat(document.querySelector('.checkout-summary__grand [data-usd]')?.dataset.usd || '0');
-
-      const message = buildWhatsAppMessage({
-        firstName, lastName, email, phone,
-        address1, address2, city, district, state, zip, country,
-        shipping: selectedShipping,
-        payment: paymentLabel,
-        items: collectItems(),
-        totalUSD,
-      });
+      const shippingVal   = document.querySelector('.shipping-option.selected input[type="radio"]')?.value || 'local-island';
+      const shippingLabel = document.querySelector('.shipping-option.selected .shipping-option__name')?.textContent.trim() || 'Standard';
+      const paymentMethod = document.querySelector('#paymentMethods .payment-method.active')?.dataset.method || 'bank';
+      const paymentLabel  = document.querySelector('#paymentMethods .payment-method.active')?.textContent.trim() || 'Bank Transfer';
 
       btn.disabled = true;
-      btn.innerHTML = '<i class="fab fa-whatsapp" style="font-size:16px;"></i> &nbsp;Opening WhatsApp\u2026';
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> &nbsp;Placing Order\u2026';
 
-      window.open('https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(message), '_blank');
-      setTimeout(() => { window.location.href = 'order-confirmation.html'; }, 1500);
+      const body = new URLSearchParams({
+        first_name: firstName, last_name: lastName,
+        email, phone, address1, address2,
+        city, country, district, state, zip,
+        shipping_method: shippingVal,
+        payment_method:  paymentMethod,
+      });
+
+      fetch('ajax/place_order.php', { method: 'POST', body })
+        .then(r => r.json())
+        .then(res => {
+          if (!res.ok) {
+            alert(res.error || 'Could not place order. Please try again.');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fab fa-whatsapp" style="font-size:16px;"></i> &nbsp;Place Order via WhatsApp';
+            return;
+          }
+
+          const message = buildWhatsAppMessage({
+            firstName, lastName, email, phone,
+            address1, address2, city, district, state, zip,
+            country: countryName,
+            shipping: shippingLabel,
+            payment:  paymentLabel,
+            items:    collectItems(),
+            totalUSD: res.total_usd,
+            orderNumber: res.order_number,
+          });
+
+          btn.innerHTML = '<i class="fab fa-whatsapp" style="font-size:16px;"></i> &nbsp;Opening WhatsApp\u2026';
+          window.open('https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(message), '_blank');
+          setTimeout(() => {
+            window.location.href = 'order-confirmation.php?order=' + encodeURIComponent(res.order_number);
+          }, 1500);
+        })
+        .catch(() => {
+          alert('Network error. Please try again.');
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fab fa-whatsapp" style="font-size:16px;"></i> &nbsp;Place Order via WhatsApp';
+        });
     });
   }
 
@@ -341,6 +375,5 @@ const CheckoutPage = (() => {
   return { init };
 })();
 
-document.addEventListener('mc:ready', () => {
-  CheckoutPage.init();
-});
+document.addEventListener('mc:ready',        () => CheckoutPage.init());
+document.addEventListener('DOMContentLoaded', () => CheckoutPage.init());

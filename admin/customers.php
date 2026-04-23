@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/db.php';
+require_once __DIR__ . '/includes/activity.php';
 
 $pageTitle  = 'Customers';
 $activePage = 'customers';
@@ -16,14 +17,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'toggle') {
         $id  = (int)($_POST['id']  ?? 0);
         $val = (int)($_POST['val'] ?? 0);
-        if ($id) $db->prepare('UPDATE customers SET is_active = ? WHERE id = ?')->execute([$val, $id]);
+        if ($id) {
+            $db->prepare('UPDATE customers SET is_active = ? WHERE id = ?')->execute([$val, $id]);
+            $cn = $db->prepare('SELECT CONCAT(first_name," ",last_name) FROM customers WHERE id = ?');
+            $cn->execute([$id]);
+            $cname = $cn->fetchColumn() ?: "Customer #$id";
+            log_activity('customer', "\"$cname\" " . ($val ? 'activated' : 'deactivated') . '.');
+        }
         header('Location: customers.php');
+        exit;
+    }
+
+    if ($action === 'edit') {
+        $id        = (int)($_POST['id'] ?? 0);
+        $firstName = trim($_POST['first_name'] ?? '');
+        $lastName  = trim($_POST['last_name']  ?? '');
+        $email     = trim($_POST['email']      ?? '');
+        $phone     = trim($_POST['phone']      ?? '');
+        $country   = trim($_POST['country']    ?? '');
+        $isActive  = isset($_POST['is_active']) ? 1 : 0;
+
+        if ($id && $firstName && $email) {
+            // Check email uniqueness (exclude self)
+            $chk = $db->prepare('SELECT COUNT(*) FROM customers WHERE email = ? AND id != ?');
+            $chk->execute([$email, $id]);
+            if ((int)$chk->fetchColumn() > 0) {
+                $flash = 'That email is already used by another customer.';
+                $flashType = 'error';
+            } else {
+                $db->prepare('UPDATE customers SET first_name=?, last_name=?, email=?, phone=?, country=?, is_active=? WHERE id=?')
+                   ->execute([$firstName, $lastName, $email, $phone, $country, $isActive, $id]);
+                log_activity('customer', "Customer \"$firstName $lastName\" details updated.");
+                $flash = 'Customer updated successfully.';
+            }
+        } else {
+            $flash = 'First name and email are required.';
+            $flashType = 'error';
+        }
+        header('Location: customers.php?flash=' . urlencode($flash) . '&ft=' . $flashType);
         exit;
     }
 
     if ($action === 'delete') {
         $id = (int)($_POST['id'] ?? 0);
-        if ($id) $db->prepare('DELETE FROM customers WHERE id = ?')->execute([$id]);
+        if ($id) {
+            $cn = $db->prepare('SELECT CONCAT(first_name," ",last_name) FROM customers WHERE id = ?');
+            $cn->execute([$id]);
+            $cname = $cn->fetchColumn() ?: "Customer #$id";
+            $db->prepare('DELETE FROM customers WHERE id = ?')->execute([$id]);
+            log_activity('customer', "Customer \"$cname\" account deleted.");
+        }
         $flash = 'Customer removed successfully.';
         header('Location: customers.php?flash=' . urlencode($flash) . '&ft=success');
         exit;
@@ -308,6 +351,10 @@ $stats = [
                             onclick="openCustomer(<?= $c['id'] ?>)" title="View Profile">
                       <i class="fas fa-eye"></i>
                     </button>
+                    <button class="btn-admin btn-admin--ghost btn-admin--sm"
+                            onclick="openEdit(<?= $c['id'] ?>)" title="Edit Customer">
+                      <i class="fas fa-pen"></i>
+                    </button>
                     <form method="POST" style="display:inline;">
                       <input type="hidden" name="action" value="toggle">
                       <input type="hidden" name="id" value="<?= $c['id'] ?>">
@@ -349,6 +396,62 @@ $stats = [
   <div class="drawer__footer">
     <button class="btn-admin btn-admin--outline" id="drawerCancelBtn">Close</button>
   </div>
+</div>
+
+<!-- CUSTOMER EDIT DRAWER -->
+<div class="drawer" id="editDrawer" style="z-index:902;">
+  <div class="drawer__head">
+    <div class="drawer__title" id="editDrawerTitle">Edit Customer</div>
+    <button class="drawer__close" id="editDrawerClose"><i class="fas fa-times"></i></button>
+  </div>
+  <form method="POST" id="editForm">
+    <input type="hidden" name="action" value="edit">
+    <input type="hidden" name="id" id="editId">
+    <div class="drawer__body">
+      <div class="od-section" style="margin-top:0;">Personal Details</div>
+      <div class="od-grid" style="gap:14px;margin-bottom:16px;">
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <label style="font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text-mid);">First Name <span style="color:var(--danger);">*</span></label>
+          <input type="text" name="first_name" id="editFirstName" required
+            style="background:var(--dark-3);border:1px solid var(--dark-border);border-radius:7px;color:var(--text);font-size:13px;padding:9px 12px;width:100%;transition:.2s;"
+            onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--dark-border)'">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <label style="font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text-mid);">Last Name</label>
+          <input type="text" name="last_name" id="editLastName"
+            style="background:var(--dark-3);border:1px solid var(--dark-border);border-radius:7px;color:var(--text);font-size:13px;padding:9px 12px;width:100%;transition:.2s;"
+            onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--dark-border)'">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;grid-column:1/-1;">
+          <label style="font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text-mid);">Email <span style="color:var(--danger);">*</span></label>
+          <input type="email" name="email" id="editEmail" required
+            style="background:var(--dark-3);border:1px solid var(--dark-border);border-radius:7px;color:var(--text);font-size:13px;padding:9px 12px;width:100%;transition:.2s;"
+            onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--dark-border)'">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <label style="font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text-mid);">Phone</label>
+          <input type="text" name="phone" id="editPhone"
+            style="background:var(--dark-3);border:1px solid var(--dark-border);border-radius:7px;color:var(--text);font-size:13px;padding:9px 12px;width:100%;transition:.2s;"
+            onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--dark-border)'">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <label style="font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text-mid);">Country</label>
+          <input type="text" name="country" id="editCountry"
+            style="background:var(--dark-3);border:1px solid var(--dark-border);border-radius:7px;color:var(--text);font-size:13px;padding:9px 12px;width:100%;transition:.2s;"
+            onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--dark-border)'">
+        </div>
+      </div>
+      <div class="od-section">Account Status</div>
+      <label style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text-mid);cursor:pointer;margin-top:4px;">
+        <input type="checkbox" name="is_active" id="editIsActive" value="1" style="width:16px;height:16px;accent-color:var(--gold);">
+        Account is Active (customer can log in)
+      </label>
+    </div>
+    <div class="drawer__footer">
+      <button type="button" class="btn-admin btn-admin--outline" id="editDrawerCancel">Cancel</button>
+      <button type="submit" class="btn-admin btn-admin--primary"><i class="fas fa-save"></i> Save Changes</button>
+    </div>
+  </form>
 </div>
 
 
@@ -398,7 +501,10 @@ function closeDrawer() {
 }
 document.getElementById('drawerClose').addEventListener('click', closeDrawer);
 document.getElementById('drawerCancelBtn').addEventListener('click', closeDrawer);
-document.getElementById('drawerOverlay').addEventListener('click', closeDrawer);
+document.getElementById('drawerOverlay').addEventListener('click', function() {
+  closeDrawer();
+  closeEditDrawer();
+});
 
 // Open customer profile 
 function openCustomer(id) {
@@ -516,7 +622,31 @@ function statusBadge(s) {
   return `<span class="badge ${map[s]||'badge--gold'}">${s.charAt(0).toUpperCase()+s.slice(1)}</span>`;
 }
 
-// Delete modal 
+// Edit drawer
+function openEdit(id) {
+  const c = ALL_CUSTOMERS[id];
+  if (!c) return;
+  document.getElementById('editId').value          = c.id;
+  document.getElementById('editFirstName').value   = c.first_name || '';
+  document.getElementById('editLastName').value    = c.last_name  || '';
+  document.getElementById('editEmail').value       = c.email      || '';
+  document.getElementById('editPhone').value       = c.phone      || '';
+  document.getElementById('editCountry').value     = c.country    || '';
+  document.getElementById('editIsActive').checked  = c.is_active == 1;
+  document.getElementById('editDrawerTitle').textContent = 'Edit — ' + escH(c.first_name + ' ' + c.last_name);
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.getElementById('editDrawer').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+document.getElementById('editDrawerClose').addEventListener('click', closeEditDrawer);
+document.getElementById('editDrawerCancel').addEventListener('click', closeEditDrawer);
+function closeEditDrawer() {
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.getElementById('editDrawer').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// Delete modal
 function confirmDelete(id, name) {
   document.getElementById('delId').value = id;
   document.getElementById('delModalSub').textContent = 'Remove "' + name + '"? This cannot be undone.';

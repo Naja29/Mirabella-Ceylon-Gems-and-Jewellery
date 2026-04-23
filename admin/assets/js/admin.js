@@ -55,11 +55,86 @@
   btn.addEventListener('click', function (e) {
     e.stopPropagation();
     dropdown.classList.toggle('open');
+    document.getElementById('notifDropdown')?.classList.remove('open');
   });
 
   document.addEventListener('click', function () {
     dropdown.classList.remove('open');
   });
+})();
+
+/* Notification dropdown */
+(function () {
+  const btn      = document.getElementById('notifBtn');
+  const dropdown = document.getElementById('notifDropdown');
+  if (!btn || !dropdown) return;
+
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    dropdown.classList.toggle('open');
+    document.getElementById('topbarDropdown')?.classList.remove('open');
+  });
+
+  document.addEventListener('click', function () {
+    dropdown.classList.remove('open');
+  });
+})();
+
+
+/* Notification badge system */
+(function () {
+  function setBadge(id, count) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    if (count > 0) {
+      el.textContent = count > 99 ? '99+' : String(count);
+      el.classList.add('visible');
+    } else {
+      el.classList.remove('visible');
+    }
+  }
+
+  function applyNotifCounts(data) {
+    var orders    = data.orders    || 0;
+    var messages  = data.messages  || 0;
+    var reviews   = data.reviews   || 0;
+    var customers = data.customers || 0;
+    var total     = data.total     || 0;
+
+    setBadge('sbOrderBadge',    orders);
+    setBadge('sbMsgBadge',      messages);
+    setBadge('sbReviewBadge',   reviews);
+    setBadge('sbCustomerBadge', customers);
+
+    // Topbar bell
+    var bell = document.getElementById('notifBellCount');
+    if (bell) {
+      bell.textContent = total > 9 ? '9+' : String(total);
+      if (total > 0) {
+        bell.style.display = 'inline-flex';
+      } else {
+        bell.style.display = 'none';
+      }
+    }
+
+    // Keep a live copy so page scripts (e.g. messages mark-read) can decrement
+    window.MC_NOTIF = { orders: orders, messages: messages, reviews: reviews, customers: customers, total: total };
+  }
+
+  // Expose globally
+  window.applyNotifCounts = applyNotifCounts;
+
+  // Fetch counts and update — called on load AND every 30s
+  function pollCounts() {
+    fetch('ajax/notif_counts.php', { credentials: 'same-origin' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) { if (d) applyNotifCounts(d); })
+      .catch(function () {});
+  }
+
+  // Run immediately on load, then every 30 seconds
+  pollCounts();
+  setInterval(pollCounts, 30000);
 })();
 
 

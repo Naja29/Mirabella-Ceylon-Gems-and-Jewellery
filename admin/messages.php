@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/db.php';
+require_once __DIR__ . '/includes/activity.php';
 
 $pageTitle  = 'Messages';
 $activePage = 'messages';
@@ -9,13 +10,63 @@ $db        = db();
 $flash     = '';
 $flashType = 'success';
 
+// Ensure replies table exists
+$db->exec("CREATE TABLE IF NOT EXISTS `message_replies` (
+  `id`         INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `message_id` INT UNSIGNED NOT NULL,
+  `admin_id`   INT UNSIGNED DEFAULT NULL,
+  `admin_name` VARCHAR(100) NOT NULL DEFAULT 'Admin',
+  `body`       TEXT NOT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_mr_msg` (`message_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
 // Process POST 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
+    if ($action === 'reply') {
+        $id   = (int)($_POST['id']   ?? 0);
+        $body = trim($_POST['body']  ?? '');
+        if ($id && $body) {
+            $adminName = $_SESSION['admin_name'] ?? 'Admin';
+            $adminId   = $_SESSION['admin_id']   ?? null;
+            $db->prepare('INSERT INTO message_replies (message_id, admin_id, admin_name, body) VALUES (?,?,?,?)')
+               ->execute([$id, $adminId, $adminName, $body]);
+            $db->prepare('UPDATE messages SET is_read = 1 WHERE id = ?')->execute([$id]);
+            log_activity('message', "Reply sent to message #$id.");
+            $flash = 'Reply saved.';
+        } else {
+            $flash = 'Reply cannot be empty.'; $flashType = 'error';
+        }
+        header('Location: messages.php?view=' . $id . '&flash=' . urlencode($flash) . '&ft=' . $flashType);
+        exit;
+    }
+
+    if ($action === 'delete_reply') {
+        $rid = (int)($_POST['rid'] ?? 0);
+        $mid = (int)($_POST['id']  ?? 0);
+        if ($rid) $db->prepare('DELETE FROM message_replies WHERE id = ?')->execute([$rid]);
+        header('Location: messages.php?view=' . $mid);
+        exit;
+    }
+
     if ($action === 'mark_read') {
         $id = (int)($_POST['id'] ?? 0);
-        if ($id) $db->prepare('UPDATE messages SET is_read = 1 WHERE id = ?')->execute([$id]);
+        if ($id) {
+            $row = $db->prepare('SELECT name FROM messages WHERE id = ?');
+            $row->execute([$id]);
+            $sender = $row->fetchColumn() ?: "Message #$id";
+            $db->prepare('UPDATE messages SET is_read = 1 WHERE id = ?')->execute([$id]);
+            log_activity('message', "Message from \"$sender\" marked as read.");
+        }
+        // AJAX fetch from JS — return JSON instead of redirect
+        if (!empty($_POST['_ajax'])) {
+            header('Content-Type: application/json');
+            echo json_encode(['ok' => true]);
+            exit;
+        }
         header('Location: messages.php?view=' . $id);
         exit;
     }
@@ -29,6 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($action === 'mark_all_read') {
         $db->query('UPDATE messages SET is_read = 1');
+        log_activity('message', 'All messages marked as read.');
         $flash = 'All messages marked as read.';
         header('Location: messages.php?flash=' . urlencode($flash) . '&ft=success');
         exit;
@@ -36,7 +88,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($action === 'delete') {
         $id = (int)($_POST['id'] ?? 0);
-        if ($id) $db->prepare('DELETE FROM messages WHERE id = ?')->execute([$id]);
+        if ($id) {
+            $db->prepare('DELETE FROM messages WHERE id = ?')->execute([$id]);
+            log_activity('message', "Message #$id deleted.");
+        }
         $flash = 'Message deleted.';
         header('Location: messages.php?flash=' . urlencode($flash) . '&ft=success');
         exit;
@@ -70,7 +125,14 @@ if ($dateTo)   { $where[] = 'DATE(created_at) <= ?'; $params[] = $dateTo; }
 
 $whereStr = implode(' AND ', $where);
 
-$msgs = $db->prepare("SELECT * FROM messages WHERE $whereStr ORDER BY is_read ASC, created_at DESC");
+$msgs = $db->prepare("
+    SELECT m.*, COUNT(r.id) AS reply_count
+    FROM messages m
+    LEFT JOIN message_replies r ON r.message_id = m.id
+    WHERE $whereStr
+    GROUP BY m.id
+    ORDER BY m.is_read ASC, m.created_at DESC
+");
 $msgs->execute($params);
 $msgs = $msgs->fetchAll();
 
@@ -82,8 +144,9 @@ $stats = [
     'today'   => (int)$db->query("SELECT COUNT(*) FROM messages WHERE DATE(created_at) = CURDATE()")->fetchColumn(),
 ];
 
-// View single message & auto mark read 
-$viewMsg = null;
+// View single message & auto mark read
+$viewMsg     = null;
+$viewReplies = [];
 if (isset($_GET['view'])) {
     $vid = (int)$_GET['view'];
     $st  = $db->prepare('SELECT * FROM messages WHERE id = ?');
@@ -92,6 +155,11 @@ if (isset($_GET['view'])) {
     if ($viewMsg && !$viewMsg['is_read']) {
         $db->prepare('UPDATE messages SET is_read = 1 WHERE id = ?')->execute([$vid]);
         $viewMsg['is_read'] = 1;
+    }
+    if ($viewMsg) {
+        $rs = $db->prepare('SELECT * FROM message_replies WHERE message_id = ? ORDER BY created_at ASC');
+        $rs->execute([$vid]);
+        $viewReplies = $rs->fetchAll();
     }
 }
 ?>
@@ -129,6 +197,22 @@ if (isset($_GET['view'])) {
     .msg-sender__meta{font-size:11px;color:var(--text-soft);margin-top:3px;}
     .msg-subject{font-family:var(--font-display);font-size:16px;font-weight:600;color:var(--text);margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--dark-border);}
     .msg-body{font-size:14px;color:var(--text-mid);line-height:1.8;white-space:pre-wrap;background:var(--dark-3);border:1px solid var(--dark-border);border-radius:8px;padding:16px 18px;}
+
+    /* Reply thread */
+    .reply-thread{margin-top:24px;}
+    .reply-thread__title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;padding-bottom:6px;border-bottom:1px solid var(--dark-border);}
+    .reply-item{display:flex;gap:12px;margin-bottom:14px;}
+    .reply-avatar{width:32px;height:32px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#0d0d0d;flex-shrink:0;}
+    .reply-bubble{background:rgba(200,168,75,.08);border:1px solid rgba(200,168,75,.2);border-radius:0 10px 10px 10px;padding:10px 14px;flex:1;}
+    .reply-bubble__meta{font-size:10px;color:var(--text-soft);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;}
+    .reply-bubble__body{font-size:13px;color:var(--text-mid);line-height:1.6;white-space:pre-wrap;}
+    .reply-del-btn{background:none;border:none;color:var(--text-soft);cursor:pointer;font-size:11px;padding:2px 4px;}
+    .reply-del-btn:hover{color:var(--danger);}
+    .reply-form{margin-top:20px;}
+    .reply-form__label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;display:block;}
+    .reply-form textarea{width:100%;background:var(--dark-3);border:1px solid var(--dark-border);border-radius:8px;color:var(--text);font-family:var(--font-body);font-size:13px;padding:10px 14px;resize:vertical;min-height:90px;transition:.2s;}
+    .reply-form textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-glow);}
+    .reply-form__actions{display:flex;gap:8px;margin-top:8px;justify-content:flex-end;}
 
     /* Table row styles */
     .admin-table tbody tr.unread td{background:rgba(201,168,76,.04);}
@@ -307,6 +391,11 @@ if (isset($_GET['view'])) {
                   <span style="font-weight:<?= $m['is_read'] ? '400' : '700' ?>;color:<?= $m['is_read'] ? 'var(--text-mid)' : 'var(--text)' ?>;">
                     <?= htmlspecialchars($m['subject'] ?: '(No subject)') ?>
                   </span>
+                  <?php if ($m['reply_count'] > 0): ?>
+                  <span style="font-size:10px;font-weight:700;background:rgba(200,168,75,.12);color:var(--gold);padding:1px 7px;border-radius:10px;margin-left:6px;">
+                    <?= $m['reply_count'] ?> <?= $m['reply_count'] == 1 ? 'reply' : 'replies' ?>
+                  </span>
+                  <?php endif; ?>
                 </td>
                 <td>
                   <div class="msg-preview"><?= htmlspecialchars($m['message']) ?></div>
@@ -392,6 +481,8 @@ if (isset($_GET['view'])) {
 <!-- Messages data for JS -->
 <script>
 const ALL_MESSAGES = <?= json_encode(array_column($msgs, null, 'id')) ?>;
+const VIEW_REPLIES = <?= json_encode($viewReplies) ?>;
+const VIEW_MSG_ID  = <?= $viewMsg ? $viewMsg['id'] : 'null' ?>;
 </script>
 
 <script src="assets/js/admin.js"></script>
@@ -411,7 +502,7 @@ document.getElementById('drawerClose').addEventListener('click', closeDrawer);
 document.getElementById('drawerCancelBtn').addEventListener('click', closeDrawer);
 document.getElementById('drawerOverlay').addEventListener('click', closeDrawer);
 
-// Open message 
+// Open message
 function openMessage(id) {
   const m = ALL_MESSAGES[id];
   if (!m) return;
@@ -425,6 +516,33 @@ function openMessage(id) {
   document.getElementById('markUnreadBtn').style.display = m.is_read == 1 ? 'inline-flex' : 'none';
 
   const phone = m.phone ? `<span style="margin-left:10px;"><i class="fas fa-phone" style="margin-right:4px;font-size:10px;"></i>${escH(m.phone)}</span>` : '';
+
+  // Build replies HTML (only available when server pre-loaded them via ?view=)
+  const replies = (VIEW_MSG_ID == id) ? VIEW_REPLIES : [];
+  let repliesHtml = '';
+  if (replies.length) {
+    repliesHtml = '<div class="reply-thread"><div class="reply-thread__title">Replies (' + replies.length + ')</div>';
+    replies.forEach(r => {
+      const initR = escH(r.admin_name.charAt(0).toUpperCase());
+      repliesHtml += `
+        <div class="reply-item">
+          <div class="reply-avatar">${initR}</div>
+          <div class="reply-bubble">
+            <div class="reply-bubble__meta">
+              <span>${escH(r.admin_name)} &middot; ${fmtDate(r.created_at)}</span>
+              <form method="POST" style="display:inline;" onsubmit="return confirm('Delete this reply?')">
+                <input type="hidden" name="action" value="delete_reply">
+                <input type="hidden" name="rid" value="${r.id}">
+                <input type="hidden" name="id" value="${id}">
+                <button type="submit" class="reply-del-btn" title="Delete reply"><i class="fas fa-trash"></i></button>
+              </form>
+            </div>
+            <div class="reply-bubble__body">${escH(r.body)}</div>
+          </div>
+        </div>`;
+    });
+    repliesHtml += '</div>';
+  }
 
   document.getElementById('drawerBody').innerHTML = `
     <div class="msg-sender">
@@ -440,17 +558,57 @@ function openMessage(id) {
     </div>
     ${m.subject ? `<div class="msg-subject">${escH(m.subject)}</div>` : ''}
     <div class="msg-body">${escH(m.message)}</div>
+    ${repliesHtml}
+    <div class="reply-form" style="margin-top:24px;">
+      <label class="reply-form__label">Write a Reply (internal note)</label>
+      <form method="POST">
+        <input type="hidden" name="action" value="reply">
+        <input type="hidden" name="id" value="${id}">
+        <textarea name="body" placeholder="Type your reply or internal note here…" required></textarea>
+        <div class="reply-form__actions">
+          <button type="submit" class="btn-admin btn-admin--primary btn-admin--sm">
+            <i class="fas fa-save"></i> Save Reply
+          </button>
+        </div>
+      </form>
+    </div>
   `;
 
-  // Mark as read visually (remove gold dot)
-  const row = document.querySelector(`tr[onclick="openMessage(${id})"]`);
-  if (row) {
-    row.classList.remove('unread');
-    const dot = row.querySelector('td:first-child span');
-    if (dot) dot.remove();
-    const subjectEl = row.querySelector('td:nth-child(3) span');
-    if (subjectEl) { subjectEl.style.fontWeight = '400'; subjectEl.style.color = 'var(--text-mid)'; }
+  // Mark as read in DB + visually if message was unread
+  if (m.is_read == 0) {
+    ALL_MESSAGES[id].is_read = 1;
+    const fd = new FormData();
+    fd.append('action', 'mark_read');
+    fd.append('id', id);
+    fd.append('_ajax', '1');
+    fetch('messages.php', { method: 'POST', body: fd, credentials: 'same-origin' })
+      .then(function () {
+        // Decrement live badge count
+        if (window.MC_NOTIF && window.applyNotifCounts) {
+          window.MC_NOTIF.messages = Math.max(0, (window.MC_NOTIF.messages || 1) - 1);
+          window.MC_NOTIF.total    = Math.max(0, (window.MC_NOTIF.total    || 1) - 1);
+          window.applyNotifCounts(window.MC_NOTIF);
+        }
+      })
+      .catch(function () {});
+
+    const row = document.querySelector(`tr[onclick="openMessage(${id})"]`);
+    if (row) {
+      row.classList.remove('unread');
+      const dot = row.querySelector('td:first-child span');
+      if (dot) dot.remove();
+      const subjectEl = row.querySelector('td:nth-child(3) span');
+      if (subjectEl) { subjectEl.style.fontWeight = '400'; subjectEl.style.color = 'var(--text-mid)'; }
+    }
+    // Hide "N new" badge in page heading
+    const headBadge = document.querySelector('.page-header__title span');
+    if (headBadge) {
+      const remaining = document.querySelectorAll('tr.unread').length - 1;
+      if (remaining <= 0) headBadge.remove();
+      else headBadge.textContent = remaining + ' new';
+    }
   }
+  document.getElementById('markUnreadBtn').style.display = 'inline-flex';
 
   openDrawer();
 }

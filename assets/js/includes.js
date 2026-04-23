@@ -27,7 +27,7 @@
 <header class="site-header" role="banner">
   <div class="header__inner">
 
-    <a href="index.html" class="header__logo" aria-label="Mirabella Ceylon home">
+    <a href="index.php" class="header__logo" aria-label="Mirabella Ceylon home">
       <img src="assets/images/logo.png" alt="Mirabella Ceylon" onerror="this.style.display='none';" />
       <div class="header__logo-text">
         <span class="brand-name">Mirabella Ceylon</span>
@@ -39,10 +39,10 @@
 
     <nav class="header__nav" aria-label="Main navigation">
       <ul>
-        <li><a href="index.html"         data-nav="home">Home</a></li>
-        <li><a href="shop.html"          data-nav="shop">Collections</a></li>
-        <li><a href="index.html#about"    data-nav="about">About Us</a></li>
-        <li><a href="contact.html"        data-nav="contact">Contact</a></li>
+        <li><a href="index.php"         data-nav="home">Home</a></li>
+        <li><a href="shop.php"          data-nav="shop">Collections</a></li>
+        <li><a href="index.php#about"   data-nav="about">About Us</a></li>
+        <li><a href="contact.php"       data-nav="contact">Contact</a></li>
       </ul>
     </nav>
 
@@ -52,30 +52,30 @@
         <button class="header__action-btn" id="accountBtn" aria-label="Account" aria-expanded="false" aria-controls="accountDropdown"><i class="far fa-user"></i></button>
         <div class="account-dropdown" id="accountDropdown" aria-hidden="true">
           <div class="account-dropdown__arrow"></div>
-          <a href="login.html" class="account-dropdown__item">
+          <a href="login.php" class="account-dropdown__item">
             <div class="account-dropdown__icon"><i class="fas fa-sign-in-alt"></i></div>
             <div class="account-dropdown__text"><span>Sign In</span><small>Access your account</small></div>
           </a>
-          <a href="register.html" class="account-dropdown__item">
+          <a href="register.php" class="account-dropdown__item">
             <div class="account-dropdown__icon"><i class="fas fa-user-plus"></i></div>
             <div class="account-dropdown__text"><span>Register</span><small>Create a new account</small></div>
           </a>
           <div class="account-dropdown__divider"></div>
-          <a href="wishlist.html" class="account-dropdown__item">
+          <a href="wishlist.php" class="account-dropdown__item">
             <div class="account-dropdown__icon"><i class="far fa-heart"></i></div>
             <div class="account-dropdown__text"><span>My Wishlist</span><small>Saved items</small></div>
           </a>
-          <a href="orders.html" class="account-dropdown__item">
+          <a href="account.php?tab=orders" class="account-dropdown__item">
             <div class="account-dropdown__icon"><i class="fas fa-box-open"></i></div>
             <div class="account-dropdown__text"><span>My Orders</span><small>Track your purchases</small></div>
           </a>
-          <a href="profile.html" class="account-dropdown__item">
+          <a href="account.php" class="account-dropdown__item">
             <div class="account-dropdown__icon"><i class="fas fa-user-cog"></i></div>
             <div class="account-dropdown__text"><span>My Profile</span><small>Settings &amp; preferences</small></div>
           </a>
         </div>
       </div>
-      <a href="cart.html" class="header__action-btn" aria-label="Cart">
+      <a href="cart.php" class="header__action-btn" aria-label="Cart">
         <i class="fas fa-shopping-bag"></i>
         <span class="cart-badge">0</span>
       </a>
@@ -88,10 +88,10 @@
 
   <nav class="mobile-nav" id="mobileNav" aria-label="Mobile navigation">
     <ul>
-      <li><a href="index.html"         data-nav="home">Home</a></li>
-      <li><a href="shop.html"          data-nav="shop">Collections</a></li>
-      <li><a href="index.html#about"  data-nav="about">About Us</a></li>
-      <li><a href="contact.html"     data-nav="contact">Contact</a></li>
+      <li><a href="index.php"         data-nav="home">Home</a></li>
+      <li><a href="shop.php"          data-nav="shop">Collections</a></li>
+      <li><a href="index.php#about"   data-nav="about">About Us</a></li>
+      <li><a href="contact.php"       data-nav="contact">Contact</a></li>
     </ul>
   </nav>
 </header>
@@ -125,23 +125,23 @@
       <div>
         <h4 class="footer__col-title">Quick Links</h4>
         <ul class="footer__links">
-          <li><a href="index.html"><i class="fas fa-chevron-right"></i> Home</a></li>
-          <li><a href="shop.html"><i class="fas fa-chevron-right"></i> Collections</a></li>
-          <li><a href="index.html#about"><i class="fas fa-chevron-right"></i> About Us</a></li>
-          <li><a href="contact.html"><i class="fas fa-chevron-right"></i> Contact</a></li>
-          <li><a href="refund-policy.html"><i class="fas fa-chevron-right"></i> Refund &amp; Returns</a></li>
-          <li><a href="cart.html"><i class="fas fa-chevron-right"></i> Shopping Cart</a></li>
+          <li><a href="index.php"><i class="fas fa-chevron-right"></i> Home</a></li>
+          <li><a href="shop.php"><i class="fas fa-chevron-right"></i> Collections</a></li>
+          <li><a href="index.php#about"><i class="fas fa-chevron-right"></i> About Us</a></li>
+          <li><a href="contact.php"><i class="fas fa-chevron-right"></i> Contact</a></li>
+          <li><a href="refund-policy.php"><i class="fas fa-chevron-right"></i> Refund &amp; Returns</a></li>
+          <li><a href="cart.php"><i class="fas fa-chevron-right"></i> Shopping Cart</a></li>
         </ul>
       </div>
 
       <div>
         <h4 class="footer__col-title">Gemstones</h4>
         <ul class="footer__links">
-          <li><a href="shop.html?cat=sapphire"><i class="fas fa-chevron-right"></i> Blue Sapphires</a></li>
-          <li><a href="shop.html?cat=padparadscha"><i class="fas fa-chevron-right"></i> Padparadscha</a></li>
-          <li><a href="shop.html?cat=cats-eye"><i class="fas fa-chevron-right"></i> Cat's Eye</a></li>
-          <li><a href="shop.html?cat=ruby"><i class="fas fa-chevron-right"></i> Natural Rubies</a></li>
-          <li><a href="shop.html?cat=star-sapphire"><i class="fas fa-chevron-right"></i> Star Sapphires</a></li>
+          <li><a href="shop.php?cat=blue-sapphire"><i class="fas fa-chevron-right"></i> Blue Sapphires</a></li>
+          <li><a href="shop.php?cat=padparadscha"><i class="fas fa-chevron-right"></i> Padparadscha</a></li>
+          <li><a href="shop.php?cat=cats-eye"><i class="fas fa-chevron-right"></i> Cat's Eye</a></li>
+          <li><a href="shop.php?cat=ruby"><i class="fas fa-chevron-right"></i> Natural Rubies</a></li>
+          <li><a href="shop.php?cat=star-sapphire"><i class="fas fa-chevron-right"></i> Star Sapphires</a></li>
         </ul>
       </div>
 
@@ -174,11 +174,11 @@
         Designed by <a href="https://www.asseminate.com/" target="_blank" rel="noopener noreferrer">Asseminate</a>
       </p>
       <div class="footer__legal">
-        <a href="privacy-policy.html">Privacy Policy</a>
+        <a href="privacy-policy.php">Privacy Policy</a>
         <span class="footer__legal-sep">|</span>
-        <a href="terms.html">Terms &amp; Conditions</a>
+        <a href="terms.php">Terms &amp; Conditions</a>
         <span class="footer__legal-sep">|</span>
-        <a href="refund-policy.html">Refund &amp; Returns</a>
+        <a href="refund-policy.php">Refund &amp; Returns</a>
       </div>
     </div>
   </div>
@@ -194,7 +194,7 @@
       <p class="cookie-banner__text">
         We use cookies to enhance your browsing experience, personalise content, and analyse our traffic.
         By clicking <strong>"Accept All"</strong> you consent to our use of cookies.
-        Read our <a href="privacy-policy.html">Privacy Policy</a> for more information.
+        Read our <a href="cookies-policy.php">Cookies Policy</a> for more information.
       </p>
     </div>
     <div class="cookie-banner__actions">
@@ -280,19 +280,19 @@
       <div class="search-default" id="searchDefault">
         <p class="search-default__label">Browse by category</p>
         <div class="search-default__tags">
-          <a href="shop.html?cat=sapphire"><i class="fas fa-gem"></i> Blue Sapphires</a>
-          <a href="shop.html?cat=padparadscha"><i class="fas fa-gem"></i> Padparadscha</a>
-          <a href="shop.html?cat=cats-eye"><i class="fas fa-eye"></i> Cat's Eye</a>
-          <a href="shop.html?cat=ruby"><i class="fas fa-gem"></i> Rubies</a>
-          <a href="shop.html?cat=star-sapphire"><i class="fas fa-star"></i> Star Sapphires</a>
-          <a href="shop.html?cat=jewellery"><i class="fas fa-ring"></i> Jewellery</a>
+          <a href="shop.php?cat=blue-sapphire"><i class="fas fa-gem"></i> Blue Sapphires</a>
+          <a href="shop.php?cat=padparadscha"><i class="fas fa-gem"></i> Padparadscha</a>
+          <a href="shop.php?cat=cats-eye"><i class="fas fa-eye"></i> Cat's Eye</a>
+          <a href="shop.php?cat=ruby"><i class="fas fa-gem"></i> Rubies</a>
+          <a href="shop.php?cat=star-sapphire"><i class="fas fa-star"></i> Star Sapphires</a>
+          <a href="shop.php?cat=jewellery"><i class="fas fa-ring"></i> Jewellery</a>
         </div>
       </div>
       <div class="search-results-list" id="searchResultsList" style="display:none;"></div>
       <div class="search-no-results" id="searchNoResults" style="display:none;">
         <i class="fas fa-gem"></i>
         <p>No results for "<span id="searchNoResultsTerm"></span>"</p>
-        <a href="shop.html">Browse all collections <i class="fas fa-arrow-right"></i></a>
+        <a href="shop.php">Browse all collections <i class="fas fa-arrow-right"></i></a>
       </div>
     </div>
   </div>
@@ -374,9 +374,9 @@
       var href = link.getAttribute('href');
       if (!href) return;
 
-      /* Match bare "#id" or "index.html#id" */
+      /* Match bare "#id" or "index.php#id" */
       var bare  = href.match(/^#(.+)$/);
-      var index = href.match(/^index\.html#(.+)$/);
+      var index = href.match(/^index\.php#(.+)$/);
       var id    = bare ? bare[1] : (index && isHome ? index[1] : null);
 
       if (!id) return;
@@ -402,12 +402,12 @@
   }
 
 
-  /* True when the current page is the home page (index.html or root) */
+  /* True when the current page is the home page (index.php or root) */
   function isHomePage() {
     var path = window.location.pathname;
     return path === '/' ||
-           path === '/index.html' ||
-           path.endsWith('/index.html') ||
+           path === '/index.php' ||
+           path.endsWith('/index.php') ||
            path.endsWith('/');
   }
 

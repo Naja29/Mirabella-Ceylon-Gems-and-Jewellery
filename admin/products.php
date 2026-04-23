@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/db.php';
+require_once __DIR__ . '/includes/activity.php';
 
 $pageTitle  = 'Products';
 $activePage = 'products';
@@ -23,7 +24,9 @@ function uniqueSlug(PDO $db, string $base, ?int $excludeId = null): string {
         $sql  = 'SELECT COUNT(*) FROM products WHERE slug = ?';
         $args = [$slug];
         if ($excludeId) { $sql .= ' AND id != ?'; $args[] = $excludeId; }
-        if ((int)$db->prepare($sql) && ($st = $db->prepare($sql)) && $st->execute($args) && $st->fetchColumn() == 0) break;
+        $st = $db->prepare($sql);
+        $st->execute($args);
+        if ((int)$st->fetchColumn() === 0) break;
         $slug = $orig . '-' . $i++;
     }
     return $slug;
@@ -57,7 +60,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'delete') {
         $id = (int)($_POST['id'] ?? 0);
         if ($id) {
+            $pname = $db->prepare('SELECT name FROM products WHERE id = ?');
+            $pname->execute([$id]);
+            $pn = $pname->fetchColumn() ?: "Product #$id";
             $db->prepare('DELETE FROM products WHERE id = ?')->execute([$id]);
+            log_activity('product', "Product \"$pn\" deleted.");
             $flash = 'Product deleted successfully.';
         }
         header('Location: products.php?flash=' . urlencode($flash) . '&ft=success');
@@ -67,7 +74,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'toggle') {
         $id  = (int)($_POST['id'] ?? 0);
         $val = (int)($_POST['val'] ?? 0);
-        if ($id) $db->prepare('UPDATE products SET is_active = ? WHERE id = ?')->execute([$val, $id]);
+        if ($id) {
+            $db->prepare('UPDATE products SET is_active = ? WHERE id = ?')->execute([$val, $id]);
+            $pname = $db->prepare('SELECT name FROM products WHERE id = ?');
+            $pname->execute([$id]);
+            $pn = $pname->fetchColumn() ?: "Product #$id";
+            log_activity('product', "Product \"$pn\" " . ($val ? 'activated' : 'deactivated') . '.');
+        }
         header('Location: products.php');
         exit;
     }
@@ -95,8 +108,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $isFeatured  = isset($_POST['is_featured'])  ? 1 : 0;
         $isActive    = isset($_POST['is_active'])    ? 1 : 0;
 
+        // Check SKU uniqueness
+        $skuConflict = false;
+        if ($sku) {
+            $skuSql  = 'SELECT COUNT(*) FROM products WHERE sku = ?';
+            $skuArgs = [$sku];
+            if ($id) { $skuSql .= ' AND id != ?'; $skuArgs[] = $id; }
+            $skuSt = $db->prepare($skuSql);
+            $skuSt->execute($skuArgs);
+            $skuConflict = (int)$skuSt->fetchColumn() > 0;
+        }
+
         if (!$name || $price <= 0) {
             $flash = 'Name and price are required.';
+            $flashType = 'error';
+        } elseif ($skuConflict) {
+            $flash = "SKU \"$sku\" is already used by another product. Please use a unique SKU.";
             $flashType = 'error';
         } else {
             $slug      = uniqueSlug($db, $name, $id);
@@ -113,6 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $gemType,$origin,$weightCt,$dimensions,$colour,$clarity,
                     $cut,$treatment,$cert,$price,$compareP,
                     $stock,$isFeatured,$isActive,$imagePath]);
+                log_activity('product', "New product \"{$name}\" added.");
                 $flash = "Product \"{$name}\" added successfully.";
             } else {
                 $existing = $db->prepare('SELECT image_main FROM products WHERE id = ?');
@@ -131,6 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $gemType,$origin,$weightCt,$dimensions,$colour,$clarity,
                     $cut,$treatment,$cert,$price,$compareP,
                     $stock,$isFeatured,$isActive,$finalImg,$id]);
+                log_activity('product', "Product \"{$name}\" updated.");
                 $flash = "Product \"{$name}\" updated successfully.";
             }
 

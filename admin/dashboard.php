@@ -281,32 +281,30 @@ function statusBadge($status) {
             </div>
             <div class="admin-card__body">
               <?php if (empty($recentActivity)): ?>
-              <div class="activity-list">
-                <div class="activity-item">
-                  <div class="activity-item__dot activity-item__dot--payment">
-                    <i class="fas fa-check"></i>
-                  </div>
-                  <div class="activity-item__text">
-                    <div class="activity-item__title">Admin panel is ready</div>
-                    <div class="activity-item__time">Just now</div>
-                  </div>
-                </div>
-                <div class="activity-item">
-                  <div class="activity-item__dot activity-item__dot--message">
-                    <i class="fas fa-gem"></i>
-                  </div>
-                  <div class="activity-item__text">
-                    <div class="activity-item__title">Database connected successfully</div>
-                    <div class="activity-item__time">Just now</div>
-                  </div>
-                </div>
+              <div style="padding:24px 0;text-align:center;color:var(--text-soft);">
+                <i class="fas fa-history" style="font-size:28px;opacity:.3;display:block;margin-bottom:10px;"></i>
+                <div style="font-size:13px;">No activity yet. Actions like updating orders, adding products, and approving reviews will appear here.</div>
               </div>
               <?php else: ?>
+              <?php
+              $iconMap = [
+                'order'    => ['fas fa-box-open',    'payment'],
+                'product'  => ['fas fa-gem',         'gold'],
+                'category' => ['fas fa-layer-group', 'gold'],
+                'review'   => ['fas fa-star',        'message'],
+                'message'  => ['fas fa-envelope',    'message'],
+                'customer' => ['fas fa-user',        'payment'],
+                'login'    => ['fas fa-sign-in-alt', 'payment'],
+                'settings' => ['fas fa-cog',         'payment'],
+              ];
+              ?>
               <div class="activity-list">
-                <?php foreach ($recentActivity as $item): ?>
+                <?php foreach ($recentActivity as $item):
+                  [$icon, $dotClass] = $iconMap[$item['type']] ?? ['fas fa-circle', 'payment'];
+                ?>
                 <div class="activity-item">
-                  <div class="activity-item__dot activity-item__dot--<?= htmlspecialchars($item['type']) ?>">
-                    <i class="fas fa-circle" style="font-size:8px;"></i>
+                  <div class="activity-item__dot activity-item__dot--<?= $dotClass ?>">
+                    <i class="<?= $icon ?>" style="font-size:10px;"></i>
                   </div>
                   <div class="activity-item__text">
                     <div class="activity-item__title"><?= htmlspecialchars($item['description']) ?></div>
